@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OndoKeşif — Finansın Yeni Omurgası</title>
+<style>
+:root{--bg:#090909;--panel:#111;--panel2:#161616;--text:#fff;--muted:#666;--muted2:#333;--border:#1e1e1e;--border2:#2c2c2c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+#prog{position:fixed;top:0;left:0;height:2px;background:var(--text);width:0;z-index:2000;transition:width .08s;}
+
+header{position:fixed;top:0;width:100%;padding:15px 48px;display:flex;justify-content:space-between;align-items:center;background:rgba(9,9,9,0.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:1000;}
+.logo-o{font-weight:700;font-size:1.1rem;letter-spacing:.5px;color:#fff;}
+.logo-k{font-weight:400;font-size:1.1rem;letter-spacing:.5px;color:rgba(255,255,255,.28);}
+.h-right{display:flex;align-items:center;gap:20px;}
+.price-pill{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:.8rem;}
+.price-val{font-weight:600;font-variant-numeric:tabular-nums;}
+.price-chg{font-size:.75rem;font-variant-numeric:tabular-nums;}
+.up{color:#4ade80;}.down{color:#f87171;}
+.mode-sel{display:flex;background:var(--panel);border:1px solid var(--border);padding:3px;border-radius:30px;}
+.mbtn{background:transparent;border:none;color:var(--muted);padding:7px 16px;font-size:.78rem;font-weight:500;cursor:pointer;border-radius:20px;transition:all .2s;white-space:nowrap;}
+.mbtn.active{background:var(--text);color:var(--bg);font-weight:600;}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 48px;}
+section{padding:110px 0;border-bottom:1px solid var(--border);opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease;}
+section.vis{opacity:1;transform:none;}
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:140px;}
+
+.tag{font-size:.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin-bottom:16px;}
+h1{font-size:3.6rem;font-weight:700;line-height:1.06;letter-spacing:-2.5px;margin-bottom:24px;}
+h2{font-size:2.2rem;font-weight:600;line-height:1.12;letter-spacing:-1px;margin-bottom:20px;}
+h3{font-size:1.05rem;font-weight:600;margin-bottom:10px;}
+.lead{font-size:1.08rem;color:var(--muted);max-width:680px;margin-bottom:44px;line-height:1.85;}
+p{line-height:1.75;}
+
+.expert-c{display:none;}
+body.expert .expert-c{display:block;}
+body.expert .bonly{display:none;}
+
+.metrics{display:flex;gap:52px;flex-wrap:wrap;margin-bottom:16px;}
+.metric .mv{font-size:2.6rem;font-weight:700;letter-spacing:-1.5px;line-height:1;}
+.metric .ml{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:7px;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:36px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px;}
+.card{background:var(--panel);border:1px solid var(--border);padding:28px;border-radius:10px;transition:border-color .2s,transform .2s;}
+.card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.card p{color:var(--muted);font-size:.92rem;}
+
+/* SVG ICONS */
+.ci{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;margin-bottom:18px;color:var(--muted);flex-shrink:0;}
+.ci svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;}
+
+.en{display:none;margin-top:14px;padding:12px 16px;background:rgba(255,255,255,.025);border-left:2px solid var(--border2);font-size:.86rem;color:var(--muted);line-height:1.7;border-radius:0 6px 6px 0;}
+body.expert .en{display:block;}
+
+/* PRODUCTS */
+.prod-badge{display:inline-block;font-size:.66rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border:1px solid var(--border2);padding:4px 9px;border-radius:4px;margin-bottom:16px;}
+
+/* ─── PARTNERS ─── */
+.partner-list{margin-top:8px;}
+.p-row{border-bottom:1px solid var(--border);cursor:pointer;}
+.p-row:first-child{border-top:1px solid var(--border);}
+.p-trigger{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:24px;transition:opacity .2s;}
+.p-trigger:hover .p-name{color:#fff;}
+.p-left{display:flex;align-items:center;gap:20px;}
+.p-name{font-size:1.25rem;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:-.3px;transition:color .25s;}
+.p-name.active{color:#fff;}
+.p-cat{font-size:.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:2px;flex-shrink:0;}
+.p-arrow{width:18px;height:18px;flex-shrink:0;color:var(--muted2);transition:transform .3s;}
+.p-arrow svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.p-arrow.open{transform:rotate(90deg);}
+
+/* SHIMMER PANEL */
+.p-panel{max-height:0;overflow:hidden;transition:max-height .42s cubic-bezier(.4,0,.2,1);}
+.p-panel.open{max-height:260px;}
+.p-panel-inner{
+  margin-bottom:16px;padding:24px 28px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#181818 0%,#1d1d1d 40%,#222 50%,#1d1d1d 60%,#181818 100%);
+  border:1px solid #282828;
+  position:relative;overflow:hidden;
+}
+.p-panel-inner::before{
+  content:'';position:absolute;top:0;left:-150%;width:80%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(210,210,210,.04),rgba(240,240,240,.07),rgba(210,210,210,.04),transparent);
+  animation:panelShimmer 4s ease 0.3s infinite;
+}
+@keyframes panelShimmer{0%{left:-150%}100%{left:200%}}
+.p-panel-inner h4{font-size:.98rem;font-weight:600;margin-bottom:8px;position:relative;}
+.p-panel-inner p{font-size:.88rem;color:var(--muted);line-height:1.8;position:relative;}
+.p-role-tag{display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;padding:3px 8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);border-radius:4px;margin-bottom:12px;}
+
+/* MARKET */
+.market-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:36px;}
+.mcard{background:var(--panel);border:1px solid var(--border);padding:28px;border-radius:10px;position:relative;overflow:hidden;}
+.mcard-val{font-size:2rem;font-weight:700;letter-spacing:-1px;margin-bottom:6px;font-variant-numeric:tabular-nums;}
+.mcard-sub{font-size:.78rem;color:var(--muted);line-height:1.55;}
+.mcard-pct{font-size:.7rem;color:var(--muted2);margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-variant-numeric:tabular-nums;}
+.mbar-track{height:3px;background:rgba(255,255,255,.06);margin:18px -28px -28px;border-radius:0 0 10px 10px;overflow:hidden;}
+.mbar-fill{height:100%;width:0;transition:width 1.6s cubic-bezier(.25,1,.5,1);}
+.mbar-fill.b1{background:rgba(255,255,255,.85);}
+.mbar-fill.b2{background:rgba(255,255,255,.35);}
+.mbar-fill.b3{background:rgba(255,255,255,.12);}
+.skel{background:linear-gradient(90deg,#1a1a1a 25%,#242424 50%,#1a1a1a 75%);background-size:300% 100%;animation:sk 1.6s ease infinite;border-radius:4px;}
+@keyframes sk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+.sv{height:34px;width:90px;margin-bottom:8px;}
+.ss{height:13px;width:75%;margin-bottom:5px;}
+.sp{height:11px;width:55%;}
+.live-badge{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.market-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color .2s,color .2s;white-space:nowrap;}
+.refresh-btn:hover{border-color:var(--border2);color:var(--text);}
+.refresh-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .5s ease;}
+.refresh-btn.spinning svg{transform:rotate(360deg);}
+.updated-at{font-size:.68rem;color:var(--muted2);margin-top:14px;}
+
+/* TIMELINE */
+.tl{margin-top:36px;}
+.tl-item{display:grid;grid-template-columns:110px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid var(--border);}
+.tl-item:last-child{border-bottom:none;}
+.tl-date{font-size:.75rem;color:var(--muted);padding-top:4px;line-height:1.5;}
+.tl-badge{display:inline-block;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;padding:3px 8px;background:rgba(255,255,255,.06);color:var(--muted);border-radius:3px;margin-bottom:8px;}
+.tl-item h4{font-size:.98rem;font-weight:600;margin-bottom:7px;line-height:1.4;}
+.tl-item p{font-size:.88rem;color:var(--muted);line-height:1.75;}
+
+/* NEWS */
+.news-sources{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px;}
+.ns-card{background:var(--panel);border:1px solid var(--border);padding:20px 22px;border-radius:10px;text-decoration:none;color:inherit;display:block;transition:border-color .2s;}
+.ns-card:hover{border-color:var(--border2);}
+.ns-name{font-size:.92rem;font-weight:500;margin-bottom:4px;}
+.ns-desc{font-size:.8rem;color:var(--muted);line-height:1.5;}
+
+/* REGULATION */
+.reg-list{margin-top:32px;}
+.reg-item{display:grid;grid-template-columns:150px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid var(--border);}
+.reg-item:last-child{border-bottom:none;}
+.reg-stat{display:flex;align-items:flex-start;gap:9px;padding-top:3px;}
+.rdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.rdot.g{background:#4ade80;}.rdot.y{background:#facc15;}.rdot.gr{background:var(--muted2);}
+.reg-lbl{font-size:.78rem;font-weight:600;line-height:1.4;color:var(--muted);}
+.reg-item h4{font-size:.98rem;font-weight:600;margin-bottom:7px;}
+.reg-item p{font-size:.88rem;color:var(--muted);line-height:1.75;}
+
+/* RISK — consistent design */
+.risk-section-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px;}
+.risk-card{background:var(--panel);border:1px solid var(--border);padding:28px;border-radius:10px;}
+.risk-card h3{font-size:1rem;font-weight:600;margin-bottom:10px;}
+.risk-card p{color:var(--muted);font-size:.92rem;line-height:1.78;}
+.risk-label{display:inline-flex;align-items:center;gap:7px;font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:14px;}
+.risk-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+footer{padding:56px 0;text-align:center;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border);}
+.st{position:fixed;bottom:28px;right:28px;width:38px;height:38px;background:var(--panel);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:opacity .25s;font-size:.85rem;color:var(--muted);}
+.st.show{opacity:1;}
+
+@media(max-width:760px){
+  h1{font-size:2.2rem;letter-spacing:-1px;}h2{font-size:1.65rem;}
+  .wrap{padding:0 22px;}header{padding:13px 22px;}
+  .g2,.g3,.market-grid,.risk-section-grid{grid-template-columns:1fr;}
+  .metrics{gap:28px;}.tl-item{grid-template-columns:1fr;gap:6px;}
+  .reg-item{grid-template-columns:1fr;gap:6px;}
+  .news-sources{grid-template-columns:1fr 1fr;}
+  .h-right{gap:10px;}.price-pill{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+
+<header>
+  <div>
+    <span class="logo-o">Ondo</span><span class="logo-k">Keşif</span>
+  </div>
+  <div class="h-right">
+    <div class="price-pill">
+      <span style="font-size:.7rem;color:var(--muted)">ONDO</span>
+      <span class="price-val" id="pv">—</span>
+      <span class="price-chg" id="pc">—</span>
+    </div>
+    <div class="mode-sel">
+      <button class="mbtn active" onclick="setMode('b',this)">Yeni Başlayan</button>
+      <button class="mbtn" onclick="setMode('e',this)">Uzman / Yatırımcı</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="tag">Ondo Finance</div>
+  <h1>Küresel Finansın<br>Blokzincirindeki<br>Yeni Omurgası.</h1>
+  <p class="lead bonly">Wall Street'in trilyon dolarlık geleneksel varlıklarını yasal, güvenli ve herkes için erişilebilir biçimde dijital dünyaya taşıyan köprü. BlackRock'tan Binance'e devlerin üzerine oturduğu altyapı.</p>
+  <p class="lead expert-c">RWA tokenizasyonunun kurumsal lider altyapısı. $30T+ adreslenebilir pazarda %53 tokenize hisse pazar payı. BlackRock BUIDL entegrasyonu, NYSE 7/24 ortaklığı, SEC'in kapatılan soruşturması. Utility dönemine girildi.</p>
+  <div class="metrics">
+    <div class="metric"><div class="mv">$2.5B+</div><div class="ml">Toplam Kilitli Değer (TVL)</div></div>
+    <div class="metric"><div class="mv">%53</div><div class="ml">Tokenize Hisse Pazar Payı</div></div>
+    <div class="metric"><div class="mv">$1B+</div><div class="ml">Aylık İşlem Hacmi</div></div>
+  </div>
+</section>
+
+<!-- ─── NE YAPIYOR ─── -->
+<section id="what">
+  <div class="tag">Ondo Nedir?</div>
+  <h2>En Basit Haliyle<br>Ne Yapıyor?</h2>
+  <p class="lead bonly">Türkiye'den birinin Apple hissesi alabilmesi için normalde aracı kurum, döviz çevirme ve hafta içi mesai saatlerini beklemesi gerekiyor. Ondo bu engellerin tamamını kaldırıyor.</p>
+  <p class="lead expert-c">Ondo Finance, geleneksel finansal araçları (US Treasuries, equities, ETF'ler) cross-chain standartlarında tokenize ederek on-chain likiditeye entegre eden kurumsal altyapı protokolüdür.</p>
+  <div class="g2">
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><rect x="2" y="6" width="14" height="10" rx="1"/><path d="M5 6V4.5C5 3.1 6.8 2 9 2s4 1.1 4 2.5V6"/><line x1="5" y1="10" x2="5" y2="16"/><line x1="9" y1="10" x2="9" y2="16"/><line x1="13" y1="10" x2="13" y2="16"/></svg>
+      </div>
+      <h3>Geleneksel Finans Nerede Sıkışıyor?</h3>
+      <p class="bonly">Borsalar hafta sonu kapanır. Bankalar işlem için günler alır. Türkiye'den ABD tahvili almak onlarca belge ve aracı kurum ister. Küçük yatırımcılar büyük fonlara giremez.</p>
+      <p class="expert-c">T+2 takas gecikmeleri, coğrafi erişim kısıtlamaları, yüksek minimum yatırım eşikleri ve silo'd likidite yapısı. Küresel finansal varlıkların büyük çoğunluğu izole ve verimsiz halde.</p>
+      <div class="en">Geleneksel finans altyapısının operasyonel maliyeti günde yüz milyarlarca dolar. Clearing, settlement ve custody katmanları birleştiğinde bu maliyet DeFi entegrasyonuyla neredeyse sıfırlanabilir.</div>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><path d="M7.5 10.5A2.5 2.5 0 0 1 4 7l1.5-1.5a2.5 2.5 0 0 1 3.5 3.5"/><path d="M10.5 7.5a2.5 2.5 0 0 1 3.5 3.5L12.5 12.5a2.5 2.5 0 0 1-3.5-3.5"/><line x1="7" y1="11" x2="11" y2="7"/></svg>
+      </div>
+      <h3>Ondo Nasıl Çözüyor?</h3>
+      <p class="bonly">Gerçek dünya varlıklarını blokzincire taşıyor. Artık o varlıklar 7/24, dünyanın her yerinden, saniyeler içinde, çok düşük maliyetle alınıp satılabiliyor. Aracısız.</p>
+      <p class="expert-c">SEC kayıtlı, KYC/AML uyumlu RWA token ihracı. Ethereum, Solana, Mantle'da likit tutularak DeFi ile TradFi arbitrajını kapatıyor. On-chain settlement T+0'a iniyor.</p>
+      <div class="en">Ondo Global Markets ürünüyle hisse senetlerinin Solana'da saniyeler içinde tokenize edilmesi — teorik değil fiili. BitGo IPO tokenizasyonu bunu kanıtladı.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── KAVRAMLAR ─── -->
+<section id="concepts">
+  <div class="tag">Temel Kavramlar</div>
+  <h2>İki Kavramı Anlayan<br>Her Şeyi Anlar.</h2>
+  <div class="g2">
+    <div class="card">
+      <h3>Tokenizasyon Nedir?</h3>
+      <p class="bonly">Bir varlığın dijital ikizini oluşturmak. Devasa bir binanın tapusunu binlerce küçük dijital parçaya bölmek gibi — artık o binaya sahip olmak için tüm binayı almak zorunda değilsiniz. Dilediğiniz kadar pay alır, istediğiniz zaman satarsınız.</p>
+      <p class="expert-c">Geleneksel finansal araçların blokzincir üzerinde akıllı sözleşmeler ile temsil edilmesi. Her token zincir dışı varlığa 1:1 bağlı ve yasal güvence altında. Fraksiyon sahipliği ve sermaye verimliliği mümkün.</p>
+      <div class="en">Tokenize varlıklar DeFi'de teminat olarak kullanılabilir — bu, geleneksel finansa kıyasla çok daha verimli sermaye kullanımı ve yeni getiri katmanları demek.</div>
+    </div>
+    <div class="card">
+      <h3>Zincir Üstü (On-Chain) Nedir?</h3>
+      <p class="bonly">İşlemlerin gizli banka sunucularında değil, herkesin görebileceği, kimsenin değiştiremeyeceği global bir dijital defterde gerçekleşmesi. Sabah 3'te, hafta sonunda, tatilde — fark etmez. Sistem hiç kapanmaz.</p>
+      <p class="expert-c">Merkeziyetsiz mutabakat (settlement) altyapısı. T+2 → T+0, counterparty risk eliminasyonu, permissionless composability. Tüm işlemler şeffaf ve kriptografik olarak denetlenebilir.</p>
+      <div class="en">On-chain settlement'ın kurumsal finansa entegrasyonu, repo piyasaları ve structured products alanlarında devasa verimlilik artışı. Clearing house'ların yeniden icat edilmesi.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NEDEN ÖNEMLİ ─── -->
+<section id="why">
+  <div class="tag">Neden Önemli?</div>
+  <h2>Bu Dönüşüm<br>İnsanlık İçin Ne Anlama Geliyor?</h2>
+  <p class="lead">Tokenizasyon sadece bir teknoloji değişimi değil — finansal sistemin demokratikleşmesi. Beş somut dönüşüm:</p>
+  <div class="g3">
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><ellipse cx="9" cy="9" rx="3" ry="7"/><line x1="2" y1="9" x2="16" y2="9"/><line x1="3.3" y1="5.5" x2="14.7" y2="5.5"/><line x1="3.3" y1="12.5" x2="14.7" y2="12.5"/></svg>
+      </div>
+      <h3>Sınırların Kalkması</h3>
+      <p>Türkiye'den, Arjantin'den, Endonezya'dan biri; bürokratik aracı olmadan ABD Hazine Bonosuna veya küresel hisse senetlerine doğrudan erişebilir.</p>
+      <div class="en">~4.5 milyar insan için enflasyona karşı dolarlı varlık tutmak artık mümkün. Bu Ondo'nun en kritik sosyal katkısı.</div>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><polyline points="9,5 9,9 12,11"/></svg>
+      </div>
+      <h3>7/24 Piyasa</h3>
+      <p>Geleneksel borsalar haftada 5 gün, günde 8 saat açık. Tokenize varlıklar yılın 365 günü 24 saat işlem görür. Cuma akşamı kapanan piyasa mantığı tarihe karışıyor.</p>
+      <div class="en">NYSE'nin 7/24 tokenized stock trading duyurumu bu dönüşümün kurumsal onayıdır.</div>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><line x1="9" y1="5" x2="9" y2="6.5"/><line x1="9" y1="11.5" x2="9" y2="13"/><path d="M6.5 7.5c0-1.1.9-2 2.5-2s2.5.9 2.5 2-2.5 2-2.5 2-2.5.9-2.5 2 .9 2 2.5 2 2.5-.9 2.5-2"/></svg>
+      </div>
+      <h3>Mikro Yatırım</h3>
+      <p>Normalde binlerce dolar gerektiren bir fona artık 10 dolarla girebilirsiniz. Alt limitler kalkar, büyük kurumların ayrıcalıkları herkesin erişimine açılır.</p>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><polyline points="10,2 6,10 10,10 8,16 14,7 10,7"/></svg>
+      </div>
+      <h3>Anlık Takas</h3>
+      <p>Geleneksel borsada işlem iki iş günü sonra tamamlanır (T+2). Blokzincirde saniyeler içinde. Bu tek fark bile trilyon dolarlık sermayeyi serbest bırakır.</p>
+      <div class="en">Clearing ve settlement maliyetleri küresel finans sisteminde yıllık yüz milyarlarca dolar. Bu maliyet yok olmak üzere.</div>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><circle cx="4" cy="9" r="2.5"/><circle cx="14" cy="4" r="2.5"/><circle cx="14" cy="14" r="2.5"/><line x1="6.5" y1="9" x2="11.5" y2="5"/><line x1="6.5" y1="9" x2="11.5" y2="13"/></svg>
+      </div>
+      <h3>DeFi ile Birleşim</h3>
+      <p>Tokenize edilmiş bir ABD tahvili, merkeziyetsiz finans platformlarında teminat olarak kullanılabilir. İki dünyanın en iyisi tek çatı altında birleşiyor.</p>
+      <div class="en">OUSG'nin DeFi teminat olarak kullanımı, kurumsal sermayenin on-chain ekosisteme akması için kritik köprü.</div>
+    </div>
+    <div class="card">
+      <div class="ci">
+        <svg viewBox="0 0 18 18"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/></svg>
+      </div>
+      <h3>Altyapı Oyunu</h3>
+      <p>Ondo altın satmıyor — madencilerin kazmasını satıyor. BlackRock, Goldman, Binance ve NYSE bu altyapıyı kullanıyor. Bu bir monopol konumu.</p>
+      <div class="en">%53 pazar payıyla "winner takes most" dinamiği Ondo lehine işliyor. Her yeni kurumsal ortak ağ etkisini pekiştiriyor.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ÜRÜNLER ─── -->
+<section id="products">
+  <div class="tag">Ürünler</div>
+  <h2>Ondo'nun Üç<br>Temel Ürünü</h2>
+  <div class="g3">
+    <div class="card">
+      <div class="prod-badge">Getiri · Stablecoin</div>
+      <h3>USDY</h3>
+      <p>Amerikan Hazine bonoları ve banka mevduatlarıyla desteklenen, faiz getiren dijital dolar. Normal stablecoin'lerin aksine paranız elde tutulurken faiz kazanır.</p>
+      <div class="en" style="display:block;margin-top:14px;">Regulation D ve Regulation S çerçevesinde ihraç. KYC'li non-US retail yatırımcılara açık. GENIUS Act geçişiyle dağıtım mekanizması genişleyecek.</div>
+    </div>
+    <div class="card">
+      <div class="prod-badge">Hazine · Kurumsal</div>
+      <h3>OUSG</h3>
+      <p>BlackRock'ın ABD Hazine bonosu fonuna (BUIDL) dayalı tokenize varlık. Dünyanın en güvenli limanına blokzincir üzerinden doğrudan erişim.</p>
+      <div class="en" style="display:block;margin-top:14px;">BlackRock BUIDL fonu teminat olarak. Kurumsal yatırımcılar için on-chain US Treasury exposure. DeFi teminatı olarak da kullanılabilir.</div>
+    </div>
+    <div class="card">
+      <div class="prod-badge">Hisse · Global</div>
+      <h3>Ondo Global Markets</h3>
+      <p>Apple, Tesla, Nvidia gibi ABD hisse senetlerini ve ETF'leri Solana üzerinde tokenize eden platform. Yüzlerce varlık, 7/24, saniyeler içinde, küresel erişimle.</p>
+      <div class="en" style="display:block;margin-top:14px;">BitGo IPO'su bu altyapı üzerinden tokenize edildi. NYSE 7/24 programı buraya oturuyor. Binance ortaklığıyla 200M+ kullanıcıya kapı açıldı.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PARTNERLER ─── -->
+<section id="partners">
+  <div class="tag">Ekosistem</div>
+  <h2>Devleri Sıraya<br>Dizen Altyapı</h2>
+  <p class="lead">Bu isimler rastgele ortaklar değil — küresel finansın mimarları. Birinin adına tıklayın.</p>
+  <div class="partner-list" id="partnerList"></div>
+</section>
+
+<!-- ─── PAZAR FIRSATI ─── -->
+<section id="market">
+  <div class="market-header">
+    <div>
+      <div class="tag" style="margin-bottom:10px;">Pazar Fırsatı</div>
+      <h2 style="margin-bottom:0;">Henüz Çok Erken.<br>Veriler Ne Söylüyor?</h2>
+    </div>
+    <button class="refresh-btn" id="refreshBtn" onclick="loadMarket(true)">
+      <svg viewBox="0 0 14 14"><path d="M12.5 2.5A6 6 0 0 0 2 7"/><path d="M1.5 11.5A6 6 0 0 0 12 7"/><polyline points="12.5,2.5 12.5,5.5 9.5,5.5"/><polyline points="1.5,11.5 1.5,8.5 4.5,8.5"/></svg>
+      Yenile
+    </button>
+  </div>
+  <p class="lead" style="margin-top:16px;">Tokenize edilebilir küresel varlıklar yaklaşık 30 trilyon dolar. Aşağıdaki veriler DeFiLlama'dan canlı çekiliyor.</p>
+  <div class="market-grid">
+    <div class="mcard" id="mc1">
+      <div class="live-badge"><div class="live-dot"></div>Canlı · DeFiLlama</div>
+      <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin:10px 0 12px;">Ondo TVL</div>
+      <div class="mcard-val" id="mv1"><div class="skel sv"></div></div>
+      <div class="mcard-sub" id="ms1"><div class="skel ss"></div></div>
+      <div class="mcard-pct" id="mp1"><div class="skel sp"></div></div>
+      <div class="mbar-track"><div class="mbar-fill b1" id="mb1"></div></div>
+    </div>
+    <div class="mcard" id="mc2">
+      <div class="live-badge"><div class="live-dot"></div>Canlı · DeFiLlama</div>
+      <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin:10px 0 12px;">Tokenize RWA Pazarı</div>
+      <div class="mcard-val" id="mv2"><div class="skel sv"></div></div>
+      <div class="mcard-sub" id="ms2"><div class="skel ss"></div></div>
+      <div class="mcard-pct" id="mp2"><div class="skel sp"></div></div>
+      <div class="mbar-track"><div class="mbar-fill b2" id="mb2"></div></div>
+    </div>
+    <div class="mcard" id="mc3">
+      <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin:22px 0 12px;">Toplam Adreslenebilir</div>
+      <div class="mcard-val">$30T</div>
+      <div class="mcard-sub">Tokenize edilebilir küresel varlıkların tahmini büyüklüğü</div>
+      <div class="mcard-pct">Hedef pazar: bugünün 1,000 katı</div>
+      <div class="mbar-track"><div class="mbar-fill b3" id="mb3" style="width:100%;transition:none;"></div></div>
+    </div>
+  </div>
+  <div class="updated-at" id="updatedAt"></div>
+</section>
+
+<!-- ─── GELİR MODELİ ─── -->
+<section id="revenue">
+  <div class="tag">Gelir Modeli</div>
+  <h2>Ondo Nasıl Para Kazanıyor?</h2>
+  <p class="lead bonly">Üç kapı var. Üçü de henüz tam açılmadı — ama açıldığında ciddi para akışı başlıyor.</p>
+  <p class="lead expert-c">Üç katmanlı gelir mimarisi: işlem komisyonu, AUM bazlı yönetim ücreti, kurumsal lisanslama. GENIUS Act ile token sahiplerine doğrudan değer aktarımının önü açılacak.</p>
+  <div class="g3">
+    <div class="card">
+      <h3>1. İşlem Komisyonları</h3>
+      <p>Aylık 1 milyar doları aşan hacim üzerinden henüz komisyon alınmıyor. Tüm odak büyümede. Komisyon butonu aktif edildiğinde ciddi nakit akışı başlıyor.</p>
+      <div class="en">Fee switch governance kararına bağlı. Mevcut price/revenue rasyosu iskontolu — devreye girdiğinde değer yaratma döngüsü başlar.</div>
+    </div>
+    <div class="card">
+      <h3>2. Hazine ve Faiz Gelirleri</h3>
+      <p>USDY ve OUSG aracılığıyla yönetilen milyarlarca dolardan faiz geliri elde ediliyor. GENIUS Act bu gelirin token sahiplerine akmasını kolaylaştıracak.</p>
+      <div class="en">OUSG'de BlackRock BUIDL üzerinden net faiz marjı. Mevcut yasal kısıtlamalar kaldırıldığında protokol hazinesine akacak.</div>
+    </div>
+    <div class="card">
+      <h3>3. Kurumsal Altyapı</h3>
+      <p>BlackRock'tan Binance'e devler kendi ürünlerini tokenize etmek için Ondo'nun altyapısını kullanıyor. Her yeni ortak ağ etkisini güçlendiriyor.</p>
+      <div class="en">%53 pazar payı sürdürüldüğü sürece "infrastructure tax" benzeri ekonomik rant söz konusu. Her entegrasyon rakipler için switching cost'u artırıyor.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── KİLOMETRE TAŞLARI ─── -->
+<section id="timeline">
+  <div class="tag">Kilometre Taşları</div>
+  <h2>Ondo'nun Kritik<br>Dönüm Noktaları</h2>
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-date">Ocak 2026</div>
+      <div>
+        <div class="tl-badge">Kurumsal Onay</div>
+        <h4>NYSE — 7/24 Tokenize Hisse Senedi Ticareti</h4>
+        <p>Dünyanın en büyük borsası NYSE, Ondo altyapısı üzerine 7/24 tokenize hisse senedi ticareti başlatma planını açıkladı. Wall Street'in blokzincire teslim olmasının resmi ilanı.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Ocak 2026</div>
+      <div>
+        <div class="tl-badge">Teknik Sıçrama</div>
+        <h4>Solana'da Yüzlerce Tokenize Hisse ve ETF</h4>
+        <p>Apple, Tesla, Nvidia dahil yüzlerce ABD hissesi ve ETF Solana zincirinde canlıya geçti. Saniyeler içinde, sıfıra yakın maliyetle işlem görmeye başlandı.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Ocak 2026</div>
+      <div>
+        <div class="tl-badge">İlk Büyük Kanıt</div>
+        <h4>BitGo Halka Arzı Ondo Üzerinden Tokenize Edildi</h4>
+        <p>Kripto saklama devi BitGo'nun IPO'su Ondo Global Markets aracılığıyla tokenize edildi. Geleneksel finans ile on-chain dünyanın köprüsünün işlediğinin kanıtı.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Şubat 2026</div>
+      <div>
+        <div class="tl-badge">Kurumsal Zirve</div>
+        <h4>"Super Bowl Zirvesi": BlackRock, Goldman, Fidelity, Beyaz Saray</h4>
+        <p>Dünyanın en büyük finans kurumları ve ABD hükümeti temsilcilerini aynı masaya getiren Ondo Zirvesi. Kripto tarihinde görülmemiş düzeyde kurumsal meşruiyet.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">2026</div>
+      <div>
+        <div class="tl-badge">Kitlesel Erişim</div>
+        <h4>Binance — 200 Milyon Kullanıcıya Kapı</h4>
+        <p>Dünyanın en büyük kripto borsası, tokenize hisse senedi ürünleri için Ondo'nun altyapısını seçti. Adreslenebilir kullanıcı kitlesi bir gecede sıçradı.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">2026</div>
+      <div>
+        <div class="tl-badge">Yasal Zemin</div>
+        <h4>SEC Soruşturması Suçlama Yapılmadan Kapandı</h4>
+        <p>Ondo Finance'e yönelik SEC soruşturması herhangi bir suçlama yapılmadan sonuçlandı. Kurumsal sermayenin önündeki en büyük yasal engel kalktı.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GÜNCEL TAKİP ─── -->
+<section id="news">
+  <div class="tag">Güncel Takip</div>
+  <h2>Ondo'yu Takip Et</h2>
+  <p class="lead">Projeyle ilgili en güncel gelişmeleri bu kaynaklardan takip edebilirsiniz.</p>
+  <div id="newsContainer">
+    <div class="news-sources">
+      <a class="ns-card" href="https://ondo.finance/blog" target="_blank" rel="noopener">
+        <div class="ns-name">Ondo Blog</div>
+        <div class="ns-desc">Resmi duyurular, ürün güncellemeleri ve ekosistem haberleri</div>
+      </a>
+      <a class="ns-card" href="https://x.com/OndoFinance" target="_blank" rel="noopener">
+        <div class="ns-name">X / Twitter</div>
+        <div class="ns-desc">Anlık gelişmeler ve topluluk tartışmaları</div>
+      </a>
+      <a class="ns-card" href="https://www.coindesk.com/search/?s=ondo+finance" target="_blank" rel="noopener">
+        <div class="ns-name">CoinDesk</div>
+        <div class="ns-desc">Kurumsal perspektiften derinlemesine haberler</div>
+      </a>
+      <a class="ns-card" href="https://cointelegraph.com/search?query=ondo" target="_blank" rel="noopener">
+        <div class="ns-name">CoinTelegraph</div>
+        <div class="ns-desc">Güncel analizler ve piyasa haberleri</div>
+      </a>
+      <a class="ns-card" href="https://www.theblock.co/search#q=ondo" target="_blank" rel="noopener">
+        <div class="ns-name">The Block</div>
+        <div class="ns-desc">Araştırma odaklı derinlemesine analizler</div>
+      </a>
+      <a class="ns-card" href="https://app.rwa.xyz/assets/ondo-finance" target="_blank" rel="noopener">
+        <div class="ns-name">RWA.xyz</div>
+        <div class="ns-desc">Ondo TVL ve RWA piyasa verileri</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── REGÜLASYON ─── -->
+<section id="regulation">
+  <div class="tag">Yasal Zemin</div>
+  <h2>Regülasyon Durumu:<br>Neden Belirleyici?</h2>
+  <p class="lead bonly">Kriptonun en büyük sorunu "yasal mı değil mi?" sorusuydu. Ondo bu soruyu en baştan doğru yanıtladı.</p>
+  <p class="lead expert-c">Kurumsal capital allocation için regulatory clarity en kritik parametredir. Ondo'nun compliance-first yapısı BlackRock seviyesinde güven inşasını mümkün kıldı.</p>
+  <div class="reg-list">
+    <div class="reg-item">
+      <div class="reg-stat"><div class="rdot g"></div><div class="reg-lbl">SEC<br>Temizlendi ✓</div></div>
+      <div>
+        <h4>SEC Soruşturması Kapandı (2026)</h4>
+        <p>Herhangi bir suçlama yapılmadan kapatılan soruşturma, Ondo'nun mevzuata uyumlu yapısının resmi onayı. Kurumsal yatırımcıların önündeki en büyük yasal engel kalktı.</p>
+        <div class="en">Bu karar, Ondo'nun başlangıçtan savunduğu "regulation-compliant DeFi" tezini doğruladı. Rakiplerin kaçındığı SEC süreci Ondo için artı puan.</div>
+      </div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-stat"><div class="rdot y"></div><div class="reg-lbl">GENIUS Act<br>Bekleniyor</div></div>
+      <div>
+        <h4>ABD Stablecoin Yasası — GENIUS Act</h4>
+        <p>Stablecoin'leri ve yield-bearing varlıkları yasal çerçeveye oturtacak yasa. Geçmesi durumunda Ondo ürünlerinden elde edilen gelirlerin token sahiplerine aktarılmasının önü açılıyor.</p>
+        <div class="en">GENIUS Act, USDY için kritik. "Temettü benzeri" dağıtım yasal zemine oturursa değer akış mekanizması devreye girer. Piyasa bunu henüz fiyatlamadı.</div>
+      </div>
+    </div>
+    <div class="reg-item">
+      <div class="reg-stat"><div class="rdot g"></div><div class="reg-lbl">KYC / AML<br>Tam Uyumlu ✓</div></div>
+      <div>
+        <h4>Kurumsal Uyumluluk Altyapısı</h4>
+        <p>Ondo, başlangıçtan itibaren kurumsal standartlarda KYC ve AML uyum altyapısıyla inşa edildi. BlackRock ve JPMorgan seviyesinde ortaklıkların önkoşulu buydu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RİSK ─── -->
+<section id="risk">
+  <div class="tag">Dürüst Değerlendirme</div>
+  <h2>Madalyonun<br>Diğer Yüzü</h2>
+  <p class="lead">Her şey parlak görünse de rasyonel bir bakış için bilinmesi gereken riskler:</p>
+  <div class="risk-section-grid">
+    <div class="risk-card">
+      <div class="risk-label">
+        <svg viewBox="0 0 14 14"><path d="M7 2v6"/><circle cx="7" cy="11" r="1" fill="currentColor"/><path d="M2.5 12.5h9L7 2z"/></svg>
+        Birincil Risk
+      </div>
+      <h3>Token Enflasyonu ve Arz Baskısı</h3>
+      <p>ONDO tokenlerinin önemli bir kısmının kilidi 2028'e kadar kademeli açılmaya devam edecek. Proje temel veriler açısından mükemmel gelişim gösterse bile piyasaya sürekli yeni token girişi fiyat üzerinde uzun vadeli satış baskısı yaratabilir.</p>
+      <div class="en">Vesting takvimi ile altyapısal büyüme arasındaki decoupling geçicidir. Altyapı projeleri utility döneminde fiyatı en sert yükselenlerdir — Amazon'un lojistik kurma dönemindeki zarar yılları analoji olarak hatırlanmalı.</div>
+    </div>
+    <div class="risk-card">
+      <div class="risk-label">
+        <svg viewBox="0 0 14 14"><path d="M7 2v6"/><circle cx="7" cy="11" r="1" fill="currentColor"/><path d="M2.5 12.5h9L7 2z"/></svg>
+        İkincil Risk
+      </div>
+      <h3>Makro ve Piyasa Riskleri</h3>
+      <p>Parasal sıkılaşma ve likidite çekilmesi gibi makro faktörler kısa vadeli fiyat baskısı yaratabilir. Ayrıca Google ve CoinGecko gibi platformlardaki bölgesel kısıtlamalar (Türkiye'ye Binance API engeli gibi) kullanıcı erişimini zaman zaman güçleştirebilir.</p>
+      <div class="en">Mevcut baskının kaynağı makro konjonktür, proje temelleri değil. Güven krizi ile ekonomik kriz ayrımı burada kritik.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>© 2026 OndoKeşif — Eğitim ve bilgi amaçlı içerik. Yatırım tavsiyesi değildir.</p>
+</footer>
+
+<div class="st" id="st" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+/* ─── PARTNER DATA ─── */
+const PARTNERS = [
+  {
+    name: "BlackRock",
+    cat: "Varlık Yönetimi",
+    role: "BUIDL Fonu · OUSG Altyapısı",
+    title: "Dünyanın En Büyük Varlık Yöneticisi",
+    desc: "10 trilyon doları aşan AUM'u ile dünyanın en büyük varlık yöneticisi. BUIDL adlı tokenize para piyasası fonunu Ondo üzerinden ihraç ederek OUSG ürününün temelini oluşturdu. BlackRock'ın bu tercihi, kurumsal meşruiyetin en güçlü göstergesidir — bu ölçekteki bir kurumun bir altyapıya güvenmesi, tüm sektör için onay niteliği taşır."
+  },
+  {
+    name: "Goldman Sachs",
+    cat: "Yatırım Bankacılığı",
+    role: "Kurumsal RWA · Tokenize Hazine",
+    title: "Küresel Yatırım Bankacılığının Lider İsmi",
+    desc: "Kurumsal müşterileri için tokenize varlıklara erişim altyapısında Ondo'yu tercih eden Goldman Sachs, Şubat 2026 Super Bowl Zirvesi'nin kilit katılımcıları arasında yer aldı. Wall Street'in en prestijli kurumunun Ondo masasına oturması, projenin yalnızca bir DeFi deneyi olmadığını somut biçimde gösteriyor."
+  },
+  {
+    name: "Fidelity",
+    cat: "Varlık Yönetimi",
+    role: "Tokenize Fon · Bireysel Erişim",
+    title: "37 Milyon Bireysel Müşterinin Güvendiği Dev",
+    desc: "37 milyon bireysel ve 22.000'i aşkın kurumsal müşteriye hizmet veren Fidelity, tokenize fon ürünleri için Ondo ekosistemini kullanıyor. Bu ortaklık, Ondo'nun kurumsal ölçekten bireysel yatırımcıya uzanan geniş bir altyapı işlevi gördüğünün işareti."
+  },
+  {
+    name: "JPMorgan",
+    cat: "Yatırım Bankacılığı",
+    role: "On-Chain Repo · Kurumsal Settlement",
+    title: "Dünyanın En Büyük Yatırım Bankası",
+    desc: "On-chain repo settlement'lar ve kurumsal blockchain entegrasyonlarında Ondo altyapısını kullanan JPMorgan, geleneksel bankaların zincir üstü dünyaya geçişinin öncüsü. JPMorgan'ın tercihini yapması, Ondo'nun 'DeFi'nin kurumsal versiyonu' olarak konumlandığını tescilliyor."
+  },
+  {
+    name: "Binance",
+    cat: "Kripto Borsası",
+    role: "Tokenize Hisse · Dağıtım Kanalı",
+    title: "200 Milyon+ Kullanıcıyla Dünyanın En Büyük Kripto Borsası",
+    desc: "Tokenize hisse senedi ürünleri için Ondo Global Markets altyapısını seçen Binance, bu ortaklıkla 200 milyonu aşkın kullanıcısını Ondo'nun adreslenebilir pazarına dahil etti. Tek bir ortaklık kararıyla Ondo'nun potansiyel kullanıcı kitlesi tarihi bir sıçrama yaptı."
+  },
+  {
+    name: "NYSE",
+    cat: "Geleneksel Borsa",
+    role: "7/24 Tokenize Hisse · Wall Street Köprüsü",
+    title: "New York Menkul Kıymetler Borsası — Geleneksel Finansın Sembolü",
+    desc: "2026'da Ondo altyapısı üzerine 7/24 tokenize hisse senedi ticareti programını duyuran NYSE, Wall Street ile blokzincirin köprüsünü resmen kurdu. Geleneksel finansın en prestijli kurumunun 'açılış çanı' geleneğini sorgulaması, sektörün dönüşüm hızı hakkında çarpıcı bir mesaj."
+  },
+  {
+    name: "Solana",
+    cat: "Blokzincir Altyapısı",
+    role: "OGM Ana Zinciri · Yüzlerce Tokenize Varlık",
+    title: "Ondo Global Markets'in Birincil Blokzinciri",
+    desc: "Yüzlerce hisse senedi ve ETF'nin tokenize edildiği ana zincir. Solana'nın saniyenin altındaki işlem süreleri ve düşük maliyetleri, 7/24 küresel hisse ticaretini teknik olarak mümkün kılıyor. Ethereum'un pahalı ve yavaş kaldığı noktalarda Ondo bu altyapıyı tercih ediyor."
+  },
+  {
+    name: "Ethereum",
+    cat: "Blokzincir Altyapısı",
+    role: "USDY · OUSG Ana Settlement Zinciri",
+    title: "Ondo'nun DeFi Entegrasyon Merkezi",
+    desc: "USDY ve OUSG'nin birincil takas ve settlement zinciri. Ondo'nun DeFi entegrasyonlarının büyük çoğunluğu Ethereum üzerinde gerçekleşiyor. Kurumsal sözleşmelerin ve yönetim mekanizmalarının denetlenebilirliği açısından Ethereum'un güvenlik garantisi kritik önem taşıyor."
+  },
+  {
+    name: "Franklin Templeton",
+    cat: "Varlık Yönetimi",
+    role: "BENJI Fonu · RWA Öncüsü",
+    title: "1.5 Trilyon Dolarlık Dev Fon Yöneticisi",
+    desc: "BENJI adlı tokenize para piyasası fonu ile RWA alanında erken hareket eden kurumsal oyunculardan Franklin Templeton, Ondo ekosisteminin köklü bir finansal kurumla entegre olduğunu gösteriyor. Bu ortaklık, tokenizasyonun artık 'erken benimseyen' aşamasını geride bıraktığının kanıtı."
+  },
+  {
+    name: "Beyaz Saray",
+    cat: "Düzenleyici Çerçeve",
+    role: "GENIUS Act · Hükümet Desteği",
+    title: "ABD Federal Hükümetinin Resmi Katılımı",
+    desc: "ABD federal hükümetinin GENIUS Act gibi tokenizasyon dostu yasama süreçlerine verdiği destek, Ondo'nun operasyonel zeminini güçlendiriyor. Şubat 2026 Zirvesi'ne resmi temsilcinin katılması, projenin artık düzenleyici çevrelerde muhatap alındığını tescilliyor — bu düzeyde resmi ilgi sektörde nadiren görülür."
+  }
+];
+
+function buildPartners() {
+  const list = document.getElementById('partnerList');
+  list.innerHTML = PARTNERS.map((p, i) => `
+    <div class="p-row" id="pr-${i}">
+      <div class="p-trigger" onclick="togglePartner(${i})">
+        <div class="p-left">
+          <div class="p-name" id="pn-${i}">${p.name}</div>
+          <div class="p-cat">${p.cat}</div>
+        </div>
+        <div class="p-arrow" id="pa-${i}">
+          <svg viewBox="0 0 18 18"><polyline points="7,5 12,9 7,13"/></svg>
+        </div>
+      </div>
+      <div class="p-panel" id="pp-${i}">
+        <div class="p-panel-inner">
+          <div class="p-role-tag">${p.role}</div>
+          <h4>${p.title}</h4>
+          <p>${p.desc}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+let openIdx = null;
+function togglePartner(i) {
+  const panel = document.getElementById('pp-'+i);
+  const arrow = document.getElementById('pa-'+i);
+  const name  = document.getElementById('pn-'+i);
+  if (openIdx !== null && openIdx !== i) {
+    document.getElementById('pp-'+openIdx).classList.remove('open');
+    document.getElementById('pa-'+openIdx).classList.remove('open');
+    document.getElementById('pn-'+openIdx).classList.remove('active');
+  }
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+  name.classList.toggle('active', !isOpen);
+  openIdx = isOpen ? null : i;
+}
+
+buildPartners();
+
+/* ─── SCROLL ─── */
+window.addEventListener('scroll', () => {
+  const s = document.documentElement.scrollTop;
+  const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  document.getElementById('prog').style.width = (s / h * 100) + '%';
+  document.getElementById('st').classList.toggle('show', s > 400);
+});
+
+/* ─── SECTION REVEAL ─── */
+const io = new IntersectionObserver(e => {
+  e.forEach(x => { if (x.isIntersecting) x.target.classList.add('vis'); });
+}, { threshold: .08 });
+document.querySelectorAll('section').forEach(s => io.observe(s));
+
+/* ─── MODE TOGGLE ─── */
+function setMode(m, btn) {
+  document.querySelectorAll('.mbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.classList.toggle('expert', m === 'e');
+}
+
+/* ─── MARKET DATA ─── */
+function fmtB(n) {
+  if (n >= 1000) return '$' + (n/1000).toFixed(2) + 'T';
+  if (n >= 1)    return '$' + n.toFixed(2) + 'B';
+  return '$' + (n*1000).toFixed(0) + 'M';
+}
+function fmtBfull(n) {
+  if (n >= 1000) return '$' + (n/1000).toFixed(2) + ' Trilyon';
+  return '$' + n.toFixed(2) + ' Milyar';
+}
+function countUp(el, target, duration, fmt) {
+  const t0 = performance.now();
+  const tick = now => {
+    const p = Math.min((now - t0) / duration, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(target * e);
+    if (p < 1) requestAnimationFrame(tick);
+    else el.textContent = fmt(target);
+  };
+  requestAnimationFrame(tick);
+}
+
+let marketLoaded = false;
+async function loadMarket(force = false) {
+  if (marketLoaded && !force) return;
+
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  setTimeout(() => btn.classList.remove('spinning'), 500);
+
+  // Reset to skeleton
+  ['mv1','mv2','ms1','ms2','mp1','mp2'].forEach(id => {
+    const el = document.getElementById(id);
+    const tag = id.startsWith('mv') ? 'sv' : id.startsWith('ms') ? 'ss' : 'sp';
+    el.innerHTML = `<div class="skel ${tag}"></div>`;
+  });
+  document.getElementById('mb1').style.width = '0';
+  document.getElementById('mb2').style.width = '0';
+
+  try {
+    // Parallel: Ondo TVL + all protocols
+    const [ondoTvl, allProtocols] = await Promise.all([
+      fetch('https://api.llama.fi/tvl/ondo-finance').then(r => r.json()),
+      fetch('https://api.llama.fi/protocols').then(r => r.json())
+    ]);
+
+    const ondoB = ondoTvl / 1e9; // convert to billions
+
+    const rwaCategories = ['RWA','Tokenized Asset','Real World Assets'];
+    const rwaTotal = allProtocols
+      .filter(p => rwaCategories.includes(p.category) && p.tvl > 0)
+      .reduce((sum, p) => sum + p.tvl, 0);
+    const rwaTotalB = rwaTotal / 1e9;
+
+    const share = ondoB / rwaTotalB * 100;
+    const rwaPctOfTAM = rwaTotalB / 30000 * 100; // TAM = $30T = 30000B
+
+    // Animate numbers
+    const mv1 = document.getElementById('mv1');
+    const mv2 = document.getElementById('mv2');
+    mv1.innerHTML = '';
+    mv2.innerHTML = '';
+    countUp(mv1, ondoB, 1400, fmtB);
+    setTimeout(() => countUp(mv2, rwaTotalB, 1400, fmtB), 150);
+
+    // Subtitles
+    setTimeout(() => {
+      document.getElementById('ms1').textContent = `Tokenize RWA pazarının %${share.toFixed(1)}'i Ondo'da kilitli`;
+      document.getElementById('ms2').textContent = `${allProtocols.filter(p=>rwaCategories.includes(p.category)&&p.tvl>0).length} protokol — sektör patlama öncesi eşikte`;
+      document.getElementById('mp1').textContent = `RWA pazarındaki pay: %${share.toFixed(1)}`;
+      document.getElementById('mp2').textContent = `Toplam adreslenebilir pazarın: %${rwaPctOfTAM.toFixed(2)}'si`;
+    }, 200);
+
+    // Animate bars (share relative to each other)
+    setTimeout(() => {
+      document.getElementById('mb1').style.width = Math.min(share, 100) + '%';
+      document.getElementById('mb2').style.width = Math.min(rwaPctOfTAM * 1000, 80) + '%'; // scaled to visible
+    }, 300);
+
+    // Timestamp
+    const now = new Date();
+    document.getElementById('updatedAt').textContent =
+      `Son güncelleme: ${now.toLocaleDateString('tr-TR')} ${now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} · Kaynak: DeFiLlama`;
+
+    marketLoaded = true;
+
+  } catch(err) {
+    // Fallback to known estimates
+    const mv1 = document.getElementById('mv1');
+    const mv2 = document.getElementById('mv2');
+    mv1.innerHTML = '';
+    mv2.innerHTML = '';
+    countUp(mv1, 2.5, 1200, fmtB);
+    setTimeout(() => countUp(mv2, 30, 1200, fmtB), 150);
+    document.getElementById('ms1').textContent = "Tokenize RWA pazarının ~%8'i Ondo'da kilitli";
+    document.getElementById('ms2').textContent = 'Tahmini değer — canlı veri alınamadı';
+    document.getElementById('mp1').textContent = 'RWA pazarındaki pay: ~%8';
+    document.getElementById('mp2').textContent = 'Toplam adreslenebilir pazarın: ~%0.1\'i';
+    setTimeout(() => {
+      document.getElementById('mb1').style.width = '8.3%';
+      document.getElementById('mb2').style.width = '0.5%';
+    }, 300);
+    document.getElementById('updatedAt').textContent = 'Canlı veri alınamadı — tahmini değerler gösteriliyor';
+  }
+}
+
+// Trigger when section enters view
+const marketObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) loadMarket(); });
+}, { threshold: 0.15 });
+const marketSection = document.getElementById('market');
+if (marketSection) marketObserver.observe(marketSection);
+
+/* ─── LIVE PRICE ─── */
+async function fetchPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ondo-finance&vs_currencies=usd&include_24hr_change=true');
+    const d = await r.json();
+    const p = d['ondo-finance']?.usd, c = d['ondo-finance']?.usd_24h_change;
+    if (p) {
+      document.getElementById('pv').textContent = '$' + p.toFixed(3);
+      const el = document.getElementById('pc');
+      el.textContent = (c >= 0 ? '+' : '') + c.toFixed(2) + '%';
+      el.className = 'price-chg ' + (c >= 0 ? 'up' : 'down');
+    }
+  } catch(e) {}
+}
+fetchPrice();
+setInterval(fetchPrice, 60000);
+</script>
+</body>
+</html>
