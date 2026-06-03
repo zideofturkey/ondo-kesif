@@ -129,12 +129,104 @@ body.expert .en{display:block;}
 .tl-item h4{font-size:.98rem;font-weight:600;margin-bottom:7px;line-height:1.4;}
 .tl-item p{font-size:.88rem;color:var(--muted);line-height:1.75;}
 
-/* NEWS */
-.news-sources{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px;}
+/* NEWS AI PANEL */
+.key-card{background:var(--panel);border:1px solid var(--border);padding:24px 28px;border-radius:10px;margin-bottom:24px;}
+.key-row{display:flex;gap:10px;margin-top:14px;}
+.key-input{flex:1;background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;border-radius:7px;font-size:.85rem;font-family:inherit;outline:none;transition:border-color .2s;}
+.key-input:focus{border-color:#3a3a3a;}
+.key-input::placeholder{color:var(--muted2);}
+.key-btn{background:var(--text);color:var(--bg);border:none;padding:10px 20px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+.key-btn:hover{opacity:.85;}
+.key-note{font-size:.74rem;color:var(--muted2);margin-top:10px;}
+.key-note a{color:var(--muted);}
+.key-saved{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.key-status{font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.key-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;}
+.key-clear{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;transition:all .2s;}
+.key-clear:hover{border-color:var(--border2);color:var(--text);}
+.analyze-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+.price-ctx{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:10px;}
+.ctx-change{font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;}
+.analyze-btn{display:flex;align-items:center;gap:8px;background:var(--text);color:var(--bg);border:none;padding:11px 22px;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+.analyze-btn:hover{opacity:.85;}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed;}
+.analyze-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.analyze-btn.loading svg{animation:spin .75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-summary{background:var(--panel);border:1px solid var(--border2);padding:26px 28px;border-radius:10px;margin-bottom:16px;position:relative;overflow:hidden;}
+.ai-summary::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);}
+.ai-label{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ai-pulse{width:5px;height:5px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
+.ai-summary p{font-size:.95rem;line-height:1.85;color:rgba(255,255,255,.82);}
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.nc{background:var(--panel);border:1px solid var(--border);padding:22px;border-radius:10px;text-decoration:none;color:inherit;display:block;transition:border-color .2s,transform .2s;}
+.nc:hover{border-color:var(--border2);transform:translateY(-2px);}
+.nc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.nc-src{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+.nc-impact{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:2px 7px;border-radius:3px;}
+.nc-impact.pos{background:rgba(74,222,128,.1);color:#4ade80;}
+.nc-impact.neg{background:rgba(248,113,113,.1);color:#f87171;}
+.nc-impact.neu{background:rgba(255,255,255,.05);color:var(--muted);}
+.nc-title{font-size:.92rem;font-weight:500;line-height:1.5;margin-bottom:7px;}
+.nc-snippet{font-size:.8rem;color:var(--muted);line-height:1.6;}
+.nc-date{font-size:.7rem;color:var(--muted2);margin-top:10px;}
+.news-loading-state{padding:48px 0;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--muted);}
+.news-spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--muted);border-radius:50%;animation:spin .7s linear infinite;}
+.news-loading-text{font-size:.84rem;}
+.fallback-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .ns-card{background:var(--panel);border:1px solid var(--border);padding:20px 22px;border-radius:10px;text-decoration:none;color:inherit;display:block;transition:border-color .2s;}
 .ns-card:hover{border-color:var(--border2);}
 .ns-name{font-size:.92rem;font-weight:500;margin-bottom:4px;}
 .ns-desc{font-size:.8rem;color:var(--muted);line-height:1.5;}
+
+/* ─── PRICE POPUP ─── */
+#pricePopup{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .22s ease;}
+#pricePopup.open{opacity:1;pointer-events:all;}
+.pp-wrap{width:800px;max-width:96vw;background:#0d0d0d;border:1px solid #222;border-radius:14px;overflow:hidden;box-shadow:0 32px 90px rgba(0,0,0,.7);transform:scale(.96) translateY(10px);transition:transform .3s cubic-bezier(.34,1.4,.64,1);}
+#pricePopup.open .pp-wrap{transform:scale(1) translateY(0);}
+.pp-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #1c1c1c;}
+.pp-head-l{display:flex;align-items:baseline;gap:14px;}
+.pp-coin{font-size:.78rem;font-weight:600;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+.pp-price{font-size:1.5rem;font-weight:700;letter-spacing:-1px;font-variant-numeric:tabular-nums;}
+.pp-close{width:28px;height:28px;background:transparent;border:1px solid #252525;border-radius:50%;cursor:pointer;color:#555;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0;}
+.pp-close:hover{border-color:#333;color:#fff;}
+.pp-close svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;}
+/* grid: 4 cols × 2 rows, col 4 spans both */
+.pp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1.12fr;grid-template-rows:auto auto;}
+.pp-cell{padding:22px 20px;border-right:1px solid #181818;border-bottom:1px solid #181818;position:relative;overflow:hidden;transition:background .3s;}
+.pp-cell:nth-child(4){border-right:none;}/* col 4 has no right border */
+.pp-row2{border-bottom:none;}
+.pp-tall{grid-row:1/3;border-right:none;border-bottom:none;display:flex;flex-direction:column;gap:0;}
+.pp-label{font-size:.64rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);margin-bottom:10px;}
+.pp-big{font-size:1.9rem;font-weight:700;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums;margin-bottom:4px;}
+.pp-sub{font-size:.72rem;color:var(--muted2);}
+/* small multi-row items inside tall cell */
+.pp-tall-row{padding:18px 20px;border-bottom:1px solid #181818;flex:1;}
+.pp-tall-row:last-child{border-bottom:none;}
+.pp-tall-label{font-size:.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);margin-bottom:8px;}
+.pp-tall-val{font-size:1.1rem;font-weight:600;font-variant-numeric:tabular-nums;}
+/* alt coin cells */
+.pp-alt-name{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.pp-alt-sym{font-size:.82rem;font-weight:700;letter-spacing:.5px;}
+.pp-alt-price{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+.pp-alt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.pp-alt-row:last-child{margin-bottom:0;}
+.pp-alt-period{font-size:.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;}
+.pp-alt-val{font-size:.82rem;font-weight:600;font-variant-numeric:tabular-nums;}
+/* skeleton */
+.pp-skel{background:linear-gradient(90deg,#1a1a1a 25%,#232323 50%,#1a1a1a 75%);background-size:300% 100%;animation:sk 1.5s ease infinite;border-radius:3px;}
+.pp-sv{height:28px;width:80px;}
+.pp-ss{height:11px;width:55%;margin-top:6px;}
+/* gold special */
+@keyframes goldRay{0%{transform:translateX(-120%) rotate(20deg)}100%{transform:translateX(400%) rotate(20deg)}}
+@keyframes goldPulse{0%,100%{opacity:.8}50%{opacity:1}}
+.pp-gold{animation:goldPulse 3s ease-in-out infinite;}
+.pp-gold-ray{position:absolute;top:-30%;left:0;width:35%;height:160%;background:linear-gradient(90deg,transparent,rgba(251,191,36,.06),transparent);animation:goldRay 4s ease infinite;}
+/* pct color helpers applied via inline style */
+.price-pill{cursor:pointer;transition:opacity .15s;}
+.price-pill:hover{opacity:.75;}
+/* responsive */
+@media(max-width:640px){.pp-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto}.pp-tall{grid-row:auto;grid-column:1/3}.pp-row2{border-bottom:1px solid #181818}}
 
 /* REGULATION */
 .reg-list{margin-top:32px;}
@@ -286,7 +378,7 @@ body.expert #expertGlow{opacity:1;}
     <span class="logo-o">Ondo</span><span class="logo-k">Keşif</span>
   </div>
   <div class="h-right">
-    <div class="price-pill">
+    <div class="price-pill" onclick="openPricePopup()" title="Detaylı performans görüntüle">
       <span style="font-size:.7rem;color:var(--muted)">ONDO</span>
       <span class="price-val" id="pv">—</span>
       <span class="price-chg" id="pc">—</span>
@@ -307,9 +399,9 @@ body.expert #expertGlow{opacity:1;}
   <p class="lead bonly">Wall Street'in trilyon dolarlık geleneksel varlıklarını yasal, güvenli ve herkes için erişilebilir biçimde dijital dünyaya taşıyan köprü. BlackRock'tan Binance'e devlerin üzerine oturduğu altyapı.</p>
   <p class="lead expert-c">RWA tokenizasyonunun kurumsal lider altyapısı. $30T+ adreslenebilir pazarda %53 tokenize hisse pazar payı. BlackRock BUIDL entegrasyonu, NYSE 7/24 ortaklığı, SEC'in kapatılan soruşturması. Utility dönemine girildi.</p>
   <div class="metrics">
-    <div class="metric"><div class="mv">$2.5B+</div><div class="ml">Toplam Kilitli Değer (TVL)</div></div>
-    <div class="metric"><div class="mv">%53</div><div class="ml">Tokenize Hisse Pazar Payı</div></div>
-    <div class="metric"><div class="mv">$1B+</div><div class="ml">Aylık İşlem Hacmi</div></div>
+    <div class="metric"><div class="mv" id="heroTvl">—</div><div class="ml">Toplam Kilitli Değer (TVL)</div></div>
+    <div class="metric"><div class="mv" id="heroShare">—</div><div class="ml">Tokenize Hisse Pazar Payı</div></div>
+    <div class="metric"><div class="mv" id="heroVol">—</div><div class="ml">Aylık İşlem Hacmi (est.)</div></div>
   </div>
 </section>
 
@@ -575,35 +667,53 @@ body.expert #expertGlow{opacity:1;}
 
 <!-- ─── GÜNCEL TAKİP ─── -->
 <section id="news">
-  <div class="tag">Güncel Takip</div>
-  <h2>Ondo'yu Takip Et</h2>
-  <p class="lead">Projeyle ilgili en güncel gelişmeleri bu kaynaklardan takip edebilirsiniz.</p>
-  <div id="newsContainer">
-    <div class="news-sources">
-      <a class="ns-card" href="https://ondo.finance/blog" target="_blank" rel="noopener">
-        <div class="ns-name">Ondo Blog</div>
-        <div class="ns-desc">Resmi duyurular, ürün güncellemeleri ve ekosistem haberleri</div>
-      </a>
-      <a class="ns-card" href="https://x.com/OndoFinance" target="_blank" rel="noopener">
-        <div class="ns-name">X / Twitter</div>
-        <div class="ns-desc">Anlık gelişmeler ve topluluk tartışmaları</div>
-      </a>
-      <a class="ns-card" href="https://www.coindesk.com/search/?s=ondo+finance" target="_blank" rel="noopener">
-        <div class="ns-name">CoinDesk</div>
-        <div class="ns-desc">Kurumsal perspektiften derinlemesine haberler</div>
-      </a>
-      <a class="ns-card" href="https://cointelegraph.com/search?query=ondo" target="_blank" rel="noopener">
-        <div class="ns-name">CoinTelegraph</div>
-        <div class="ns-desc">Güncel analizler ve piyasa haberleri</div>
-      </a>
-      <a class="ns-card" href="https://www.theblock.co/search#q=ondo" target="_blank" rel="noopener">
-        <div class="ns-name">The Block</div>
-        <div class="ns-desc">Araştırma odaklı derinlemesine analizler</div>
-      </a>
-      <a class="ns-card" href="https://app.rwa.xyz/assets/ondo-finance" target="_blank" rel="noopener">
-        <div class="ns-name">RWA.xyz</div>
-        <div class="ns-desc">Ondo TVL ve RWA piyasa verileri</div>
-      </a>
+  <div class="tag">Güncel &amp; Analiz</div>
+  <h2>AI Destekli<br>Haber Takibi</h2>
+  <p class="lead">Anthropic API anahtarınızla, ONDO'yu neden hareket ettirdiğini Claude'un web'i tarayarak Türkçe analiz etmesini sağlayın.</p>
+
+  <!-- Key yönetimi -->
+  <div id="keyPanel" class="key-card">
+    <div id="keySetup">
+      <h3>API Anahtarı ile Aktifleştir</h3>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:8px;">Otomatik haber analizi için bir Anthropic API anahtarı gerekiyor. Anahtar yalnızca tarayıcınızda saklanır, hiçbir sunucuya gönderilmez.</p>
+      <div class="key-row">
+        <input class="key-input" type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
+        <button class="key-btn" onclick="saveKey()">Kaydet</button>
+      </div>
+      <p class="key-note">Anahtar tarayıcınızın <code>localStorage</code>'ında tutulur. &nbsp;<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anahtar almak için →</a></p>
+    </div>
+    <div id="keySaved" style="display:none" class="key-saved">
+      <div class="key-status"><div class="key-dot"></div>API anahtarı aktif</div>
+      <button class="key-clear" onclick="clearKey()">Anahtarı Kaldır</button>
+    </div>
+  </div>
+
+  <!-- Analiz tetikleyici -->
+  <div class="analyze-bar" id="analyzeBar" style="display:none">
+    <div class="price-ctx">
+      <span style="color:var(--muted2)">ONDO</span>
+      <span class="ctx-change" id="ctxChange">—</span>
+      <span id="ctxLabel" style="color:var(--muted2)">son 24 saat</span>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+      <svg viewBox="0 0 14 14"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg>
+      Neden? — Analiz Et
+    </button>
+  </div>
+
+  <!-- Sonuç alanı -->
+  <div id="newsResult"></div>
+
+  <!-- API anahtarı yokken fallback -->
+  <div id="newsFallback">
+    <p style="font-size:.8rem;color:var(--muted2);margin-bottom:16px;">API anahtarı olmadan takip edebileceğiniz kaynaklar:</p>
+    <div class="fallback-grid">
+      <a class="ns-card" href="https://ondo.finance/blog" target="_blank" rel="noopener"><div class="ns-name">Ondo Blog</div><div class="ns-desc">Resmi duyurular ve ürün güncellemeleri</div></a>
+      <a class="ns-card" href="https://x.com/OndoFinance" target="_blank" rel="noopener"><div class="ns-name">X / Twitter</div><div class="ns-desc">Anlık gelişmeler</div></a>
+      <a class="ns-card" href="https://www.coindesk.com/search/?s=ondo+finance" target="_blank" rel="noopener"><div class="ns-name">CoinDesk</div><div class="ns-desc">Kurumsal haberler</div></a>
+      <a class="ns-card" href="https://cointelegraph.com/search?query=ondo" target="_blank" rel="noopener"><div class="ns-name">CoinTelegraph</div><div class="ns-desc">Piyasa analizleri</div></a>
+      <a class="ns-card" href="https://www.theblock.co/search#q=ondo" target="_blank" rel="noopener"><div class="ns-name">The Block</div><div class="ns-desc">Araştırma odaklı içerik</div></a>
+      <a class="ns-card" href="https://app.rwa.xyz/assets/ondo-finance" target="_blank" rel="noopener"><div class="ns-name">RWA.xyz</div><div class="ns-desc">TVL ve piyasa verileri</div></a>
     </div>
   </div>
 </section>
@@ -837,15 +947,53 @@ function countUp(el, target, duration, fmt) {
   requestAnimationFrame(tick);
 }
 
+/* ─── HERO + SHARED DEFI DATA ─── */
+let _llamaCache = null; // shared between hero and market section
+
+async function fetchLlamaData() {
+  if (_llamaCache) return _llamaCache;
+  const [ondoTvl, allProtocols] = await Promise.all([
+    fetch('https://api.llama.fi/tvl/ondo-finance').then(r => r.json()),
+    fetch('https://api.llama.fi/protocols').then(r => r.json())
+  ]);
+  const ondoB = ondoTvl / 1e9;
+  const rwaCategories = ['RWA','Tokenized Asset','Real World Assets'];
+  const rwaProtos = allProtocols.filter(p => rwaCategories.includes(p.category) && p.tvl > 0);
+  const rwaTotalB = rwaProtos.reduce((sum, p) => sum + p.tvl, 0) / 1e9;
+  const share = ondoB / rwaTotalB * 100;
+  _llamaCache = { ondoB, rwaTotalB, share, rwaProtos, allProtocols };
+  return _llamaCache;
+}
+
+async function loadHeroData() {
+  try {
+    const { ondoB, share } = await fetchLlamaData();
+    const tvlEl   = document.getElementById('heroTvl');
+    const shareEl = document.getElementById('heroShare');
+    if (tvlEl)   countUp(tvlEl,   ondoB, 1600, v => '$' + v.toFixed(2) + 'B');
+    if (shareEl) countUp(shareEl, share,  1600, v => '%' + v.toFixed(0));
+  } catch(e) {
+    const tvlEl = document.getElementById('heroTvl');
+    const shareEl = document.getElementById('heroShare');
+    if (tvlEl)   tvlEl.textContent   = '$2.5B+';
+    if (shareEl) shareEl.textContent = '%53';
+  }
+}
+
+function updateHeroVol() {
+  const el = document.getElementById('heroVol');
+  if (!el || !marketCtx.ondoVol24h) return;
+  const monthlyB = marketCtx.ondoVol24h * 30 / 1e9;
+  countUp(el, monthlyB, 1400, v => '$' + v.toFixed(1) + 'B');
+}
+
+loadHeroData();
 let marketLoaded = false;
 async function loadMarket(force = false) {
   if (marketLoaded && !force) return;
-
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
   setTimeout(() => btn.classList.remove('spinning'), 500);
-
-  // Reset to skeleton
   ['mv1','mv2','ms1','ms2','mp1','mp2'].forEach(id => {
     const el = document.getElementById(id);
     const tag = id.startsWith('mv') ? 'sv' : id.startsWith('ms') ? 'ss' : 'sp';
@@ -853,70 +1001,39 @@ async function loadMarket(force = false) {
   });
   document.getElementById('mb1').style.width = '0';
   document.getElementById('mb2').style.width = '0';
-
   try {
-    // Parallel: Ondo TVL + all protocols
-    const [ondoTvl, allProtocols] = await Promise.all([
-      fetch('https://api.llama.fi/tvl/ondo-finance').then(r => r.json()),
-      fetch('https://api.llama.fi/protocols').then(r => r.json())
-    ]);
-
-    const ondoB = ondoTvl / 1e9; // convert to billions
-
-    const rwaCategories = ['RWA','Tokenized Asset','Real World Assets'];
-    const rwaTotal = allProtocols
-      .filter(p => rwaCategories.includes(p.category) && p.tvl > 0)
-      .reduce((sum, p) => sum + p.tvl, 0);
-    const rwaTotalB = rwaTotal / 1e9;
-
-    const share = ondoB / rwaTotalB * 100;
-    const rwaPctOfTAM = rwaTotalB / 30000 * 100; // TAM = $30T = 30000B
-
-    // Animate numbers
+    const { ondoB, rwaTotalB, share, rwaProtos } = await fetchLlamaData();
+    const rwaPctOfTAM = rwaTotalB / 30000 * 100;
     const mv1 = document.getElementById('mv1');
     const mv2 = document.getElementById('mv2');
-    mv1.innerHTML = '';
-    mv2.innerHTML = '';
+    mv1.innerHTML = ''; mv2.innerHTML = '';
     countUp(mv1, ondoB, 1400, fmtB);
     setTimeout(() => countUp(mv2, rwaTotalB, 1400, fmtB), 150);
-
-    // Subtitles
     setTimeout(() => {
       document.getElementById('ms1').textContent = `Tokenize RWA pazarının %${share.toFixed(1)}'i Ondo'da kilitli`;
-      document.getElementById('ms2').textContent = `${allProtocols.filter(p=>rwaCategories.includes(p.category)&&p.tvl>0).length} protokol — sektör patlama öncesi eşikte`;
+      document.getElementById('ms2').textContent = `${rwaProtos.length} protokol — sektör patlama öncesi eşikte`;
       document.getElementById('mp1').textContent = `RWA pazarındaki pay: %${share.toFixed(1)}`;
       document.getElementById('mp2').textContent = `Toplam adreslenebilir pazarın: %${rwaPctOfTAM.toFixed(2)}'si`;
     }, 200);
-
-    // Animate bars (share relative to each other)
     setTimeout(() => {
       document.getElementById('mb1').style.width = Math.min(share, 100) + '%';
-      document.getElementById('mb2').style.width = Math.min(rwaPctOfTAM * 1000, 80) + '%'; // scaled to visible
+      document.getElementById('mb2').style.width = Math.min(rwaPctOfTAM * 1000, 80) + '%';
     }, 300);
-
-    // Timestamp
     const now = new Date();
     document.getElementById('updatedAt').textContent =
       `Son güncelleme: ${now.toLocaleDateString('tr-TR')} ${now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} · Kaynak: DeFiLlama`;
-
     marketLoaded = true;
-
   } catch(err) {
-    // Fallback to known estimates
     const mv1 = document.getElementById('mv1');
     const mv2 = document.getElementById('mv2');
-    mv1.innerHTML = '';
-    mv2.innerHTML = '';
+    mv1.innerHTML = ''; mv2.innerHTML = '';
     countUp(mv1, 2.5, 1200, fmtB);
     setTimeout(() => countUp(mv2, 30, 1200, fmtB), 150);
     document.getElementById('ms1').textContent = "Tokenize RWA pazarının ~%8'i Ondo'da kilitli";
     document.getElementById('ms2').textContent = 'Tahmini değer — canlı veri alınamadı';
     document.getElementById('mp1').textContent = 'RWA pazarındaki pay: ~%8';
-    document.getElementById('mp2').textContent = 'Toplam adreslenebilir pazarın: ~%0.1\'i';
-    setTimeout(() => {
-      document.getElementById('mb1').style.width = '8.3%';
-      document.getElementById('mb2').style.width = '0.5%';
-    }, 300);
+    document.getElementById('mp2').textContent = "Toplam adreslenebilir pazarın: ~%0.1'i";
+    setTimeout(() => { document.getElementById('mb1').style.width='8.3%'; document.getElementById('mb2').style.width='0.5%'; }, 300);
     document.getElementById('updatedAt').textContent = 'Canlı veri alınamadı — tahmini değerler gösteriliyor';
   }
 }
@@ -928,22 +1045,423 @@ const marketObserver = new IntersectionObserver(entries => {
 const marketSection = document.getElementById('market');
 if (marketSection) marketObserver.observe(marketSection);
 
-/* ─── LIVE PRICE ─── */
+/* ─── LIVE PRICE + MARKET CONTEXT ─── */
+let currentChange = null;
+let marketCtx = {};   // BTC change, ONDO volume vs avg — fed to Claude
+
 async function fetchPrice() {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ondo-finance&vs_currencies=usd&include_24hr_change=true');
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ondo-finance,bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true');
     const d = await r.json();
-    const p = d['ondo-finance']?.usd, c = d['ondo-finance']?.usd_24h_change;
-    if (p) {
-      document.getElementById('pv').textContent = '$' + p.toFixed(3);
+    const ondo = d['ondo-finance'], btc = d['bitcoin'];
+    if (ondo?.usd) {
+      document.getElementById('pv').textContent = '$' + ondo.usd.toFixed(3);
       const el = document.getElementById('pc');
-      el.textContent = (c >= 0 ? '+' : '') + c.toFixed(2) + '%';
-      el.className = 'price-chg ' + (c >= 0 ? 'up' : 'down');
+      currentChange = ondo.usd_24h_change;
+      el.textContent = (currentChange >= 0 ? '+' : '') + currentChange.toFixed(2) + '%';
+      el.className = 'price-chg ' + (currentChange >= 0 ? 'up' : 'down');
+      updatePriceContext();
     }
+    // Store market context for Claude
+    marketCtx = {
+      ondoChange: ondo?.usd_24h_change?.toFixed(2),
+      ondoVol24h: ondo?.usd_24h_vol,
+      btcChange:  btc?.usd_24h_change?.toFixed(2),
+      btcPrice:   btc?.usd
+    };
+    updateHeroVol();
   } catch(e) {}
 }
 fetchPrice();
 setInterval(fetchPrice, 60000);
+
+/* ─── NEWS AI ─── */
+function newsInit() {
+  const key = localStorage.getItem('ondo_api_key');
+  if (key) {
+    document.getElementById('keySetup').style.display = 'none';
+    document.getElementById('keySaved').style.display = 'flex';
+    document.getElementById('analyzeBar').style.display = 'flex';
+    document.getElementById('newsFallback').style.display = 'none';
+  }
+}
+
+function saveKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-ant')) {
+    const inp = document.getElementById('apiKeyInput');
+    inp.style.borderColor = '#f87171';
+    setTimeout(() => inp.style.borderColor = '', 1600);
+    return;
+  }
+  localStorage.setItem('ondo_api_key', val);
+  document.getElementById('keySetup').style.display = 'none';
+  document.getElementById('keySaved').style.display = 'flex';
+  document.getElementById('analyzeBar').style.display = 'flex';
+  document.getElementById('newsFallback').style.display = 'none';
+}
+
+function clearKey() {
+  localStorage.removeItem('ondo_api_key');
+  document.getElementById('keySetup').style.display = 'block';
+  document.getElementById('keySaved').style.display = 'none';
+  document.getElementById('analyzeBar').style.display = 'none';
+  document.getElementById('newsFallback').style.display = 'block';
+  document.getElementById('newsResult').innerHTML = '';
+  document.getElementById('apiKeyInput').value = '';
+}
+
+function updatePriceContext() {
+  const el = document.getElementById('ctxChange');
+  const lbl = document.getElementById('ctxLabel');
+  if (!el || currentChange === null) return;
+  el.textContent = (currentChange >= 0 ? '+' : '') + currentChange.toFixed(2) + '%';
+  el.className = 'ctx-change ' + (currentChange >= 0 ? 'up' : 'down');
+  lbl.textContent = 'son 24 saat — neden?';
+}
+
+function buildMarketContext() {
+  const lines = [];
+  if (marketCtx.ondoChange != null)
+    lines.push(`ONDO son 24 saatte %${marketCtx.ondoChange > 0 ? '+' : ''}${marketCtx.ondoChange} hareket etti.`);
+  if (marketCtx.ondoVol24h)
+    lines.push(`ONDO 24 saatlik işlem hacmi: $${(marketCtx.ondoVol24h/1e6).toFixed(1)}M.`);
+  if (marketCtx.btcChange != null)
+    lines.push(`Aynı dönemde Bitcoin %${marketCtx.btcChange > 0 ? '+' : ''}${marketCtx.btcChange} değişti.`);
+  // Correlation hint
+  if (marketCtx.ondoChange != null && marketCtx.btcChange != null) {
+    const diff = Math.abs(parseFloat(marketCtx.ondoChange) - parseFloat(marketCtx.btcChange));
+    if (diff < 2)
+      lines.push('Not: ONDO ve BTC hareketi birbirine çok yakın — genel piyasa etkisi güçlü olabilir.');
+    else if (parseFloat(marketCtx.ondoChange) > parseFloat(marketCtx.btcChange) + 5)
+      lines.push('Not: ONDO, BTC\'yi belirgin şekilde aştı — projeye özgü bir katalizör olabilir.');
+  }
+  return lines.join(' ');
+}
+
+async function runAnalysis() {
+  const key = localStorage.getItem('ondo_api_key');
+  if (!key) return;
+
+  const btn = document.getElementById('analyzeBtn');
+  const result = document.getElementById('newsResult');
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2a5 5 0 1 0 5 5"/></svg> Araştırılıyor...`;
+
+  // Progressive loading messages
+  const loadMsgs = [
+    'Piyasa verisi işleniyor...',
+    'Claude güncel haberler için web\'i tarıyor...',
+    'Fiyat hareketi analiz ediliyor...',
+    'Sonuçlar derleniyor...'
+  ];
+  let msgIdx = 0;
+  result.innerHTML = `<div class="news-loading-state"><div class="news-spinner"></div><div class="news-loading-text" id="loadTxt">${loadMsgs[0]}</div></div>`;
+  const loadTimer = setInterval(() => {
+    msgIdx = Math.min(msgIdx + 1, loadMsgs.length - 1);
+    const el = document.getElementById('loadTxt');
+    if (el) el.textContent = loadMsgs[msgIdx];
+  }, 2800);
+
+  const mktCtxStr = buildMarketContext();
+  const today = new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: `Bugün ${today}. Piyasa verisi: ${mktCtxStr}
+
+Görevin: Ondo Finance (ONDO token) için iki ayrı web araması yap:
+1. Son 7 günde Ondo Finance hakkında çıkan haberler ("Ondo Finance news")
+2. Bu fiyat hareketinin spesifik sebebi ("ONDO token price movement reason today" veya "ONDO pump reason")
+
+Sonuçları birleştirip analiz et. ÖNEMLİ: Eğer fiyat hareketini açıklayan net bir haber bulamazsan, bunu dürüstçe söyle ve şu alternatifleri değerlendir: genel kripto piyasası etkisi mi, teknik toparlanma mı (önceki düşüş sonrası), kurumsal alım baskısı mı, yoksa habersiz spekülatif hareket mi olduğunu belirt.
+
+Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
+{"summary":"2-3 cümle Türkçe: fiyat hareketinin en muhtemel açıklaması — haber varsa haberi, yoksa dürüstçe piyasa dinamiğini belirt","catalyst":"news_driven veya market_driven veya technical_recovery veya unknown","news":[{"title":"Türkçe başlık","source":"kaynak","date":"tarih","url":"url","impact":"positive veya negative veya neutral","snippet":"tek cümle Türkçe"}]}
+En fazla 6 haber. Sadece JSON.`
+        }]
+      })
+    });
+
+    clearInterval(loadTimer);
+    if (res.status === 401) throw new Error('auth');
+    if (res.status === 402) throw new Error('billing');
+    if (!res.ok) throw new Error('api');
+
+    const data = await res.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('parse');
+    renderNews(JSON.parse(jsonMatch[0]));
+
+  } catch(err) {
+    clearInterval(loadTimer);
+    if (err.message === 'auth') {
+      result.innerHTML = `<div class="key-card"><p style="color:#f87171;font-size:.9rem;">API anahtarı geçersiz veya süresi dolmuş. Lütfen anahtarı kaldırıp tekrar girin.</p></div>`;
+      clearKey();
+    } else if (err.message === 'billing') {
+      result.innerHTML = `<div class="key-card"><p style="color:#facc15;font-size:.9rem;">Hesabınızda API kredisi bulunmuyor. <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:#facc15;text-decoration:underline;">console.anthropic.com → Billing</a> sayfasından kredi yükleyin ($5 minimum, aylarca yeter).</p></div>`;
+    } else {
+      result.innerHTML = `<div class="key-card"><p style="color:var(--muted);font-size:.9rem;">Analiz alınamadı — biraz bekleyip tekrar deneyin.</p></div>`;
+    }
+  }
+
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg> Yenile`;
+}
+
+function renderNews(data) {
+  const ic = i => i === 'positive' ? 'pos' : i === 'negative' ? 'neg' : 'neu';
+  const il = i => i === 'positive' ? 'Olumlu' : i === 'negative' ? 'Olumsuz' : 'Nötr';
+
+  // Catalyst badge
+  const catalystMap = {
+    news_driven:       { label: 'Haber Kaynaklı',       color: '#4ade80' },
+    market_driven:     { label: 'Genel Piyasa Etkisi',  color: '#60a5fa' },
+    technical_recovery:{ label: 'Teknik Toparlanma',    color: '#facc15' },
+    unknown:           { label: 'Net Katalizör Yok',    color: '#888'    }
+  };
+  const cat = catalystMap[data.catalyst] || catalystMap.unknown;
+  const catalystBadge = `<span style="display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.06);color:${cat.color};border:1px solid ${cat.color}30;margin-bottom:14px;">${cat.label}</span>`;
+
+  // Market context strip
+  let mktStrip = '';
+  if (marketCtx.ondoChange != null) {
+    const btcLine = marketCtx.btcChange != null
+      ? `<span style="color:var(--muted2)">·</span> BTC <span style="${parseFloat(marketCtx.btcChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.btcChange)>=0?'+':''}${marketCtx.btcChange}%</span>`
+      : '';
+    const volLine = marketCtx.ondoVol24h
+      ? `<span style="color:var(--muted2)">·</span> Hacim <span style="color:var(--muted)">$${(marketCtx.ondoVol24h/1e6).toFixed(1)}M</span>`
+      : '';
+    mktStrip = `<div style="display:flex;align-items:center;gap:10px;font-size:.78rem;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">
+      <span style="color:var(--muted2);text-transform:uppercase;letter-spacing:1px;font-size:.68rem;">Piyasa</span>
+      <span>ONDO <span style="${parseFloat(marketCtx.ondoChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.ondoChange)>=0?'+':''}${marketCtx.ondoChange}%</span></span>
+      ${btcLine} ${volLine}
+    </div>`;
+  }
+
+  const cards = (data.news || []).map(n => `
+    <a class="nc" href="${n.url||'#'}" target="_blank" rel="noopener noreferrer">
+      <div class="nc-top">
+        <span class="nc-src">${n.source||''}</span>
+        <span class="nc-impact ${ic(n.impact)}">${il(n.impact)}</span>
+      </div>
+      <div class="nc-title">${n.title||''}</div>
+      <div class="nc-snippet">${n.snippet||''}</div>
+      <div class="nc-date">${n.date||''}</div>
+    </a>`).join('');
+
+  const noNewsNote = (!data.news || data.news.length === 0)
+    ? `<p style="color:var(--muted);font-size:.88rem;padding:20px 0;">Son 7 günde öne çıkan haber bulunamadı.</p>` : '';
+
+  document.getElementById('newsResult').innerHTML = `
+    <div class="ai-summary">
+      <div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>
+      ${catalystBadge}
+      <p>${data.summary||''}</p>
+      ${mktStrip}
+    </div>
+    ${noNewsNote}
+    <div class="news-grid">${cards}</div>`;
+}
+
+/* ─── PRICE POPUP ─── */
+function fmtPct(v) {
+  if (v == null) return '—';
+  return (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+}
+function fmtUsd(v) {
+  if (v == null) return '—';
+  if (v >= 1000) return '$' + v.toLocaleString('en-US', {maximumFractionDigits:0});
+  if (v >= 1) return '$' + v.toFixed(2);
+  return '$' + v.toFixed(4);
+}
+
+/* ONDO daily colour — intensity-mapped */
+function ondoColor(pct) {
+  if (pct == null) return { text:'#666', bg:'transparent', glow:false, gold:false };
+  if (pct >= 10)  return { text:'#fbbf24', bg:'linear-gradient(135deg,rgba(180,130,20,.22) 0%,rgba(212,175,55,.1) 100%)', border:'rgba(251,191,36,.3)', glow:true, gold:true };
+  if (pct >= 5)   return { text:'#4ade80', bg:'rgba(74,222,128,.13)', border:'rgba(74,222,128,.2)', glow:true,  gold:false };
+  if (pct >= 2)   return { text:'#86efac', bg:'rgba(74,222,128,.06)', border:'transparent',           glow:false, gold:false };
+  if (pct >= 0)   return { text:'#bbf7d0', bg:'rgba(74,222,128,.025)',border:'transparent',           glow:false, gold:false };
+  if (pct >= -2)  return { text:'#fca5a5', bg:'rgba(248,113,113,.025)',border:'transparent',          glow:false, gold:false };
+  if (pct >= -5)  return { text:'#f87171', bg:'rgba(248,113,113,.06)', border:'transparent',          glow:false, gold:false };
+                  return { text:'#ef4444', bg:'rgba(248,113,113,.13)', border:'rgba(239,68,68,.2)',   glow:true,  gold:false };
+}
+/* simpler colour for other cells */
+function pctColor(v) {
+  if (v == null) return '#555';
+  return v >= 0 ? (v >= 5 ? '#4ade80' : '#86efac') : (v <= -5 ? '#ef4444' : '#f87171');
+}
+
+function openPricePopup() {
+  document.getElementById('pricePopup').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  fetchPopupData();
+}
+function closePopup() {
+  document.getElementById('pricePopup').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handlePopupClick(e) { if (e.target === e.currentTarget) closePopup(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
+
+async function fetchPopupData() {
+  try {
+    const [markets, ondoDetail] = await Promise.all([
+      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=ondo-finance,bitcoin,ethereum,solana&price_change_percentage=7d,30d,1y&sparkline=false').then(r=>r.json()),
+      fetch('https://api.coingecko.com/api/v3/coins/ondo-finance?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false').then(r=>r.json())
+    ]);
+
+    const byId = Object.fromEntries(markets.map(c => [c.id, c]));
+    const ondo = byId['ondo-finance'];
+    const md   = ondoDetail?.market_data || {};
+
+    const data = {
+      ondo: {
+        price:   ondo?.current_price,
+        d1:      ondo?.price_change_percentage_24h,
+        d7:      ondo?.price_change_percentage_7d_in_currency,
+        d30:     ondo?.price_change_percentage_30d_in_currency,
+        d60:     md.price_change_percentage_60d,
+        d200:    md.price_change_percentage_200d,
+        d365:    ondo?.price_change_percentage_1y_in_currency
+      },
+      btc: { price: byId.bitcoin?.current_price, d1: byId.bitcoin?.price_change_percentage_24h, d7: byId.bitcoin?.price_change_percentage_7d_in_currency, d30: byId.bitcoin?.price_change_percentage_30d_in_currency, d365: byId.bitcoin?.price_change_percentage_1y_in_currency },
+      eth: { price: byId.ethereum?.current_price, d1: byId.ethereum?.price_change_percentage_24h, d7: byId.ethereum?.price_change_percentage_7d_in_currency, d30: byId.ethereum?.price_change_percentage_30d_in_currency, d365: byId.ethereum?.price_change_percentage_1y_in_currency },
+      sol: { price: byId.solana?.current_price, d1: byId.solana?.price_change_percentage_24h, d7: byId.solana?.price_change_percentage_7d_in_currency, d30: byId.solana?.price_change_percentage_30d_in_currency, d365: byId.solana?.price_change_percentage_1y_in_currency }
+    };
+    renderPopup(data);
+  } catch(e) {
+    document.getElementById('ppGrid').innerHTML = `<div style="grid-column:1/-1;padding:32px;color:var(--muted);font-size:.88rem;">Veri alınamadı — biraz bekleyip tekrar deneyin.</div>`;
+  }
+}
+
+function renderPopup(d) {
+  const o = d.ondo;
+  document.getElementById('ppPrice').textContent = o.price ? fmtUsd(o.price) : '—';
+
+  const col = ondoColor(o.d1);
+  const glowStyle = col.glow ? `box-shadow:0 0 28px ${col.border};` : '';
+  const borderStyle = col.border && col.border !== 'transparent' ? `border:1px solid ${col.border};` : 'border:1px solid #181818;';
+  const goldRay = col.gold ? '<div class="pp-gold-ray"></div>' : '';
+  const goldClass = col.gold ? ' pp-gold' : '';
+
+  /* alt coin builder */
+  function altCell(sym, coin, cls='') {
+    const dc = pctColor(coin.d1);
+    return `<div class="pp-cell pp-row2${cls}">
+      <div class="pp-alt-name">
+        <span class="pp-alt-sym">${sym}</span>
+        <span class="pp-alt-price">${fmtUsd(coin.price)}</span>
+      </div>
+      <div class="pp-alt-row">
+        <span class="pp-alt-period">Günlük</span>
+        <span class="pp-alt-val" style="color:${dc}">${fmtPct(coin.d1)}</span>
+      </div>
+      <div class="pp-alt-row">
+        <span class="pp-alt-period">Haftalık</span>
+        <span class="pp-alt-val" style="color:${pctColor(coin.d7)}">${fmtPct(coin.d7)}</span>
+      </div>
+      <div class="pp-alt-row">
+        <span class="pp-alt-period">Aylık</span>
+        <span class="pp-alt-val" style="color:${pctColor(coin.d30)}">${fmtPct(coin.d30)}</span>
+      </div>
+      <div class="pp-alt-row" style="margin-top:10px;padding-top:10px;border-top:1px solid #181818;">
+        <span class="pp-alt-period">1 Yıllık</span>
+        <span class="pp-alt-val" style="color:${pctColor(coin.d365)}">${fmtPct(coin.d365)}</span>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('ppGrid').innerHTML = `
+    <!-- ONDO günlük -->
+    <div class="pp-cell${goldClass}" style="background:${col.bg};${borderStyle}${glowStyle}">
+      ${goldRay}
+      <div class="pp-label">Günlük</div>
+      <div class="pp-big" style="color:${col.text}">${fmtPct(o.d1)}</div>
+      ${col.gold ? '<div style="font-size:.7rem;color:#fbbf24;margin-top:6px;letter-spacing:1px;">✦ GÜÇLÜ HAREKET</div>' : `<div class="pp-sub">${o.price ? fmtUsd(o.price) : ''}</div>`}
+    </div>
+    <!-- ONDO haftalık -->
+    <div class="pp-cell">
+      <div class="pp-label">Haftalık</div>
+      <div class="pp-big" style="color:${pctColor(o.d7)}">${fmtPct(o.d7)}</div>
+      <div class="pp-sub">7 gün</div>
+    </div>
+    <!-- ONDO aylık -->
+    <div class="pp-cell">
+      <div class="pp-label">Aylık</div>
+      <div class="pp-big" style="color:${pctColor(o.d30)}">${fmtPct(o.d30)}</div>
+      <div class="pp-sub">30 gün</div>
+    </div>
+    <!-- ONDO uzun vade — spans both rows -->
+    <div class="pp-cell pp-tall">
+      <div class="pp-tall-row">
+        <div class="pp-tall-label">2 Aylık</div>
+        <div class="pp-tall-val" style="color:${pctColor(o.d60)}">${fmtPct(o.d60)}</div>
+      </div>
+      <div class="pp-tall-row">
+        <div class="pp-tall-label">~6 Aylık</div>
+        <div class="pp-tall-val" style="color:${pctColor(o.d200)}">${fmtPct(o.d200)}</div>
+      </div>
+      <div class="pp-tall-row">
+        <div class="pp-tall-label">1 Yıllık</div>
+        <div class="pp-tall-val" style="color:${pctColor(o.d365)}">${fmtPct(o.d365)}</div>
+      </div>
+    </div>
+    <!-- Alts -->
+    ${altCell('BTC', d.btc)}
+    ${altCell('ETH', d.eth)}
+    ${altCell('SOL', d.sol, '')}
+  `;
+}
+
+
 </script>
-</body>
+<!-- ─── PRICE POPUP ─── -->
+<div id="pricePopup" onclick="handlePopupClick(event)">
+  <div class="pp-wrap">
+    <div class="pp-head">
+      <div class="pp-head-l">
+        <span class="pp-coin">ONDO / USD</span>
+        <span class="pp-price" id="ppPrice">—</span>
+      </div>
+      <button class="pp-close" onclick="closePopup()">
+        <svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+      </button>
+    </div>
+    <div class="pp-grid" id="ppGrid">
+      <!-- filled by JS -->
+      <div class="pp-cell"><div class="pp-label">Günlük</div><div class="pp-skel pp-sv"></div><div class="pp-skel pp-ss" style="margin-top:8px"></div></div>
+      <div class="pp-cell"><div class="pp-label">Haftalık</div><div class="pp-skel pp-sv"></div></div>
+      <div class="pp-cell"><div class="pp-label">Aylık</div><div class="pp-skel pp-sv"></div></div>
+      <div class="pp-cell pp-tall">
+        <div class="pp-tall-row"><div class="pp-tall-label">3 Aylık</div><div class="pp-skel pp-sv"></div></div>
+        <div class="pp-tall-row"><div class="pp-tall-label">6 Aylık</div><div class="pp-skel pp-sv"></div></div>
+        <div class="pp-tall-row"><div class="pp-tall-label">1 Yıllık</div><div class="pp-skel pp-sv"></div></div>
+      </div>
+      <div class="pp-cell pp-row2"><div class="pp-skel pp-sv"></div></div>
+      <div class="pp-cell pp-row2"><div class="pp-skel pp-sv"></div></div>
+      <div class="pp-cell pp-row2"><div class="pp-skel pp-sv"></div></div>
+    </div>
+  </div>
+</div>
+
+
 </html>
