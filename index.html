@@ -1175,6 +1175,7 @@ async function runAnalysis() {
         'Content-Type': 'application/json',
         'x-api-key': key,
         'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'web-search-2025-03-05',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
@@ -1201,7 +1202,11 @@ En fazla 6 haber. Sadece JSON.`
     clearInterval(loadTimer);
     if (res.status === 401) throw new Error('auth');
     if (res.status === 402) throw new Error('billing');
-    if (!res.ok) throw new Error('api');
+    if (!res.ok) {
+      let errBody = '';
+      try { const e = await res.json(); errBody = e?.error?.message || JSON.stringify(e); } catch(_) {}
+      throw new Error(`http_${res.status}:${errBody}`);
+    }
 
     const data = await res.json();
     const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
@@ -1217,7 +1222,8 @@ En fazla 6 haber. Sadece JSON.`
     } else if (err.message === 'billing') {
       result.innerHTML = `<div class="key-card"><p style="color:#facc15;font-size:.9rem;">Hesabınızda API kredisi bulunmuyor. <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:#facc15;text-decoration:underline;">console.anthropic.com → Billing</a> sayfasından kredi yükleyin ($5 minimum, aylarca yeter).</p></div>`;
     } else {
-      result.innerHTML = `<div class="key-card"><p style="color:var(--muted);font-size:.9rem;">Analiz alınamadı — biraz bekleyip tekrar deneyin.</p></div>`;
+      const detail = err.message.startsWith('http_') ? err.message.replace('http_','HTTP ') : err.message;
+      result.innerHTML = `<div class="key-card"><p style="color:var(--muted);font-size:.9rem;">Analiz alınamadı — <span style="color:#f87171;font-size:.82rem;">${detail}</span></p></div>`;
     }
   }
 
