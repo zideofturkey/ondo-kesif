@@ -147,10 +147,38 @@ body.expert .en{display:block;}
 .analyze-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
 .price-ctx{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:10px;}
 .ctx-change{font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums;}
-.analyze-btn{display:flex;align-items:center;gap:8px;background:var(--text);color:var(--bg);border:none;padding:11px 22px;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
-.analyze-btn:hover{opacity:.85;}
-.analyze-btn:disabled{opacity:.4;cursor:not-allowed;}
-.analyze-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.analyze-btn{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.05);
+  border-top:1px solid rgba(255,255,255,.13);
+  border-left:1px solid rgba(255,255,255,.07);
+  border-right:1px solid rgba(0,0,0,.3);
+  border-bottom:1px solid rgba(0,0,0,.3);
+  color:#999;
+  padding:11px 24px;
+  border-radius:18px;
+  font-size:.84rem;font-weight:500;letter-spacing:.3px;
+  cursor:pointer;
+  white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 8px rgba(0,0,0,.3);
+  transition:all .3s ease;
+  position:relative;overflow:hidden;
+}
+.analyze-btn::before{
+  content:'';position:absolute;
+  top:0;left:-120%;width:55%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
+  transition:left .5s ease;
+}
+.analyze-btn:hover::before{left:160%;}
+.analyze-btn:hover{
+  background:rgba(255,255,255,.08);
+  border-top-color:rgba(255,255,255,.18);
+  color:#c8c8c8;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 3px 12px rgba(0,0,0,.35);
+}
+.analyze-btn:disabled{opacity:.35;cursor:not-allowed;}
+.analyze-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.7;}
 .analyze-btn.loading svg{animation:spin .75s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ai-summary{background:var(--panel);border:1px solid var(--border2);padding:26px 28px;border-radius:10px;margin-bottom:16px;position:relative;overflow:hidden;}
@@ -1154,6 +1182,24 @@ function updatePriceContext() {
   el.textContent = (currentChange >= 0 ? '+' : '') + currentChange.toFixed(2) + '%';
   el.className = 'ctx-change ' + (currentChange >= 0 ? 'up' : 'down');
   lbl.textContent = 'son 24 saat — neden?';
+}
+
+function buildMarketContext() {
+  const lines = [];
+  if (marketCtx.ondoChange != null)
+    lines.push(`ONDO son 24 saatte %${marketCtx.ondoChange > 0 ? '+' : ''}${marketCtx.ondoChange} hareket etti.`);
+  if (marketCtx.ondoVol24h)
+    lines.push(`ONDO 24 saatlik işlem hacmi: $${(marketCtx.ondoVol24h/1e6).toFixed(1)}M.`);
+  if (marketCtx.btcChange != null)
+    lines.push(`Aynı dönemde Bitcoin %${marketCtx.btcChange > 0 ? '+' : ''}${marketCtx.btcChange} değişti.`);
+  if (marketCtx.ondoChange != null && marketCtx.btcChange != null) {
+    const diff = Math.abs(parseFloat(marketCtx.ondoChange) - parseFloat(marketCtx.btcChange));
+    if (diff < 2)
+      lines.push('Not: ONDO ve BTC hareketi birbirine çok yakın — genel piyasa etkisi güçlü olabilir.');
+    else if (parseFloat(marketCtx.ondoChange) > parseFloat(marketCtx.btcChange) + 5)
+      lines.push('Not: ONDO, BTC\'yi belirgin şekilde aştı — projeye özgü bir katalizör olabilir.');
+  }
+  return lines.join(' ');
 }
 
 async function runAnalysis() {
