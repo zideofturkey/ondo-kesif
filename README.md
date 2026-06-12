@@ -1,122 +1,131 @@
 <div align="center">
 
-# OndoKeşif
-### AI-Powered Ondo Finance Intelligence Dashboard
+![OndoKeşif Banner](banner.svg)
 
-[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-zideofturkey.github.io-black?style=for-the-badge)](https://zideofturkey.github.io/ondo-kesif)
-[![Claude AI](https://img.shields.io/badge/Powered_by-Claude_AI-CC785C?style=for-the-badge)](https://anthropic.com)
-[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
-[![GitHub Pages](https://img.shields.io/badge/Hosted_on-GitHub_Pages-222?style=for-the-badge&logo=github)](https://pages.github.com)
+<br>
 
-*Ondo Finance'i gerçek zamanlı veriler ve yapay zeka destekli haberlerle takip edin.*
+[![Live Demo](https://img.shields.io/badge/🌐_LIVE_DEMO-zideofturkey.github.io-0d1828?style=for-the-badge&labelColor=0d1828&color=1e2d4a)](https://zideofturkey.github.io/ondo-kesif)&nbsp;
+[![Claude AI](https://img.shields.io/badge/Claude_AI-Haiku-1a1a1a?style=for-the-badge&logo=anthropic&logoColor=CC785C&labelColor=111)](https://anthropic.com)&nbsp;
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-1a1a1a?style=for-the-badge&logo=cloudflare&logoColor=F38020&labelColor=111)](https://workers.cloudflare.com)&nbsp;
+[![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-1a1a1a?style=for-the-badge&logo=github&logoColor=white&labelColor=111)](https://pages.github.com)
 
 </div>
 
----
+<br>
 
 ## What is this?
 
-OndoKeşif is a single-page intelligence dashboard built to monitor **Ondo Finance (ONDO)** — a real-world asset (RWA) tokenization protocol with $3.7B+ TVL and 53% market share in tokenized equities.
+**OndoKeşif** is a single-page intelligence dashboard for tracking **Ondo Finance (ONDO)** — the leading real-world asset (RWA) tokenization protocol with $3.7B+ TVL and 53% market share in tokenized equities (BlackRock, Goldman Sachs, NYSE, Binance).
 
-The site is designed for both beginners and expert investors, with a toggle that adapts the content depth accordingly.
+The site adapts content depth to the viewer: a **Beginner mode** explains tokenization and on-chain concepts from scratch, while **Expert / Investor mode** surfaces technical context, protocol economics, and institutional data.
 
----
+<br>
 
 ## Features
 
-### 📡 Live Market Data
-- Real-time ONDO price with 24h change, fetched from **CoinGecko API**
-- Clickable performance popup: daily, weekly, monthly, 2-month, 6-month, 1-year returns
-- BTC, ETH, SOL comparison in the same popup with their own performance breakdowns
-- Market opportunity section powered by **DeFiLlama API** (live TVL, RWA market share)
+#### 📡 &nbsp; Live Market Data
+- Real-time ONDO price (24h Δ) via **CoinGecko API**, auto-refreshes every 60 seconds
+- Performance popup: daily / weekly / monthly / 2-month / 6-month / 1-year returns
+- BTC, ETH, SOL comparison with full performance breakdowns in the same popup
+- Market opportunity cards from **DeFiLlama API** — live TVL, RWA market share, protocol count
 
-### 🤖 AI-Powered News Analysis
-- One-click analysis: Claude searches the web and explains **why ONDO is moving**
-- Returns a structured report: market catalyst type, relevant news, market comparison
-- Compares ONDO movement against BTC/ETH/SOL — identifies correlation vs. divergence
-- Secured via **Cloudflare Worker** proxy — API key never exposed in frontend code
-- Daily usage limit with password bypass for admin
+#### 🤖 &nbsp; AI-Powered News Analysis
+- One click: Claude searches the web and explains **why ONDO is moving today**
+- Identifies the catalyst type — news-driven, market-driven, technical recovery, or unknown
+- Compares ONDO against BTC / ETH / SOL — surfaces correlation and divergence
+- Market context (24h volume, 7-day returns) sent to Claude for grounded analysis
+- Secured via **Cloudflare Worker** — API key never touches the frontend
+- Daily usage limit with admin override
 
-### 🎨 Design & UX
-- Minimal dark theme with a premium **expert mode atmosphere** (navy gradients, edge glow, corner hotspots)
-- Smooth section reveal animations, scroll progress bar
-- Mobile-first responsive layout with a slide-in navigation panel
-- Beginner / Expert mode toggle that adapts content depth across all sections
+#### 🎨 &nbsp; Design
+- Minimal dark theme (`#090909`) that shifts into a **premium expert atmosphere** on mode toggle — navy gradient background, warm golden edge glows, animated corner hotspots
+- Smooth scroll-triggered section reveals, sticky progress bar
+- Mobile-first: price popup becomes a bottom sheet, navigation collapses into a side panel
 
-### 🏗️ Content
-- Comprehensive Ondo Finance explainer (what it is, why it matters, products, partners)
-- Interactive ecosystem section — 10 institutional partners with expandable detail panels
-- Timeline of key milestones (NYSE 7/24, Solana integration, Binance partnership, etc.)
-- Regulation tracker (SEC, GENIUS Act, KYC/AML status)
-- Honest risk analysis section
+#### 🏛️ &nbsp; Content
+- Full Ondo Finance explainer — tokenization, on-chain settlement, product suite (USDY, OUSG, OGM)
+- 10 institutional partners with expandable detail panels (shimmer effect)
+- Milestone timeline: NYSE 7/24, Solana integration, BitGo IPO, Binance partnership, SEC closure
+- Regulation tracker: SEC, GENIUS Act, KYC/AML compliance status
+- Honest risk section: token vesting schedule, macro factors
 
----
+<br>
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | Vanilla HTML + CSS + JavaScript (no frameworks) |
-| Live Price & Market Data | CoinGecko API |
-| TVL & RWA Market Data | DeFiLlama API |
-| AI News Analysis | Anthropic Claude (Haiku) + Web Search Tool |
-| API Security | Cloudflare Workers (serverless proxy) |
-| Hosting | GitHub Pages |
+| Layer | Technology | Notes |
+|---|---|---|
+| Frontend | Vanilla HTML + CSS + JS | No frameworks, no build step |
+| Live Price | CoinGecko API | ONDO, BTC, ETH, SOL — 24h + 7d |
+| TVL & RWA Market | DeFiLlama API | Live TVL, protocol list, share calc |
+| AI Analysis | Anthropic Claude (Haiku) | Web search tool enabled |
+| API Security | Cloudflare Workers | Serverless proxy, encrypted env var |
+| Hosting | GitHub Pages | Single file deploy |
 
-> Built entirely as a single HTML file. No build tools, no dependencies, no backend — except the Cloudflare Worker that keeps the API key off the client.
+> Built as a single `index.html`. No bundler, no package manager, no runtime dependencies — except the Cloudflare Worker that keeps the API key off the client.
 
----
+<br>
 
 ## How the AI Analysis Works
 
 ```
 User clicks "Analiz Et"
         ↓
-Confirmation popup (daily limit check)
+Confirmation popup — daily limit check (localStorage)
         ↓
-Frontend sends market context to Cloudflare Worker
-(current ONDO %, BTC/ETH/SOL performance, 24h volume)
+Frontend bundles market context:
+  ONDO, BTC, ETH, SOL → 24h change, 7d change, volume
+  Current TVL from DeFiLlama
         ↓
-Worker forwards to Anthropic API (key stored securely in env)
+POST → Cloudflare Worker (API key in encrypted env, never in HTML)
         ↓
-Claude runs two web searches:
-  1. "Ondo Finance news this week"
-  2. "ONDO token price movement reason today"
+Worker → Anthropic API (Claude Haiku + web_search tool)
+        ↓
+Claude runs two searches:
+  "Ondo Finance news this week"
+  "ONDO token price movement reason today"
         ↓
 Returns structured JSON:
-  - summary (Turkish)
-  - catalyst type (news_driven / market_driven / technical_recovery / unknown)
-  - up to 6 news cards with source, date, impact tag
-  - market comparison vs BTC/ETH/SOL with correlation analysis
+  · summary     (Turkish, 2-3 sentences)
+  · catalyst    (news_driven | market_driven | technical_recovery | unknown)
+  · news[]      (up to 6 cards: title, source, date, url, impact)
+  · comparison  (ONDO vs BTC/ETH/SOL — correlation or divergence, Turkish)
         ↓
-Rendered on page with catalyst badge + market strip
+Rendered with catalyst badge, market strip, comparison block
 ```
 
----
+<br>
 
 ## Setup
 
-This project is intentionally zero-dependency. To run locally, just open `index.html` in a browser.
+No setup needed to browse locally — just open `index.html`.
 
-To enable the AI analysis feature, you'll need:
+To enable AI analysis:
 
-1. An [Anthropic API key](https://console.anthropic.com/settings/keys) with credits
-2. A free [Cloudflare Workers](https://workers.cloudflare.com) account
+```
+1. Anthropic API key  →  console.anthropic.com/settings/keys
+2. Cloudflare account →  workers.cloudflare.com  (free tier)
 
-Deploy `ondo-worker.js` as a Cloudflare Worker, set `ANTHROPIC_API_KEY` as an encrypted environment variable, then update the `WORKER_URL` constant in `index.html`.
+   Deploy ondo-worker.js as a Worker
+   Add ANTHROPIC_API_KEY as encrypted environment variable
+   Update WORKER_URL in index.html
+```
 
----
+<br>
 
 ## Project Background
 
-This project was built iteratively — starting from a Gemini-generated prototype, then developed feature by feature into a full intelligence dashboard. Core additions include the real-time data layer, the AI analysis engine, the performance popup, the expert mode atmospheric design, and the complete mobile experience.
+Started as a Gemini-generated prototype, rebuilt feature by feature into a full intelligence dashboard. Core additions: real-time data layer, AI analysis engine with Cloudflare proxy, performance popup, expert mode atmospheric design (CSS `@property` animations, conic gradients, golden edge glows), and a complete mobile experience.
+
+<br>
 
 ---
 
 <div align="center">
+<br>
 
-Built by **Ediz Kaçmaz** · [ediz@edizkacmaz.com](mailto:ediz@edizkacmaz.com)
+Built by &nbsp;**[Ediz Kaçmaz](mailto:ediz@edizkacmaz.com)**
 
-*Eğitim ve bilgi amaçlıdır. Yatırım tavsiyesi değildir.*
+<sub>Eğitim ve bilgi amaçlıdır &nbsp;·&nbsp; Yatırım tavsiyesi değildir</sub>
 
 </div>
