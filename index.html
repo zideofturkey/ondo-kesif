@@ -466,29 +466,62 @@ body.expert #expertGlow{opacity:1;}
   .news-sources{grid-template-columns:1fr 1fr;}
   .h-right{gap:10px;}
   .h-right .mode-sel{display:none;}
-  #sideMenu .mode-sel{display:flex;}
+  #sideMenu .mode-sel{display:flex;width:100%;}
+  #sideMenu .mbtn{flex:1;text-align:center;font-size:.72rem;padding:7px 6px;}
   .price-pill{display:flex;}
   .pp-news-btn{display:none;}
-  /* mobile price popup */
-  .pp-wrap{border-radius:10px;max-height:92vh;overflow-y:auto;}
-  .pp-head{padding:14px 16px;}
-  .pp-price{font-size:1.1rem;}
+  /* mobile price popup — compact single-screen */
+  #pricePopup{align-items:flex-end;}
+  .pp-wrap{
+    width:100%;max-width:100%;
+    border-radius:14px 14px 0 0;
+    max-height:88vh;
+    display:flex;flex-direction:column;
+    transform:translateY(100%);
+  }
+  #pricePopup.open .pp-wrap{transform:translateY(0);}
+  .pp-head{padding:12px 16px;flex-shrink:0;}
+  .pp-coin{font-size:.7rem;}
+  .pp-price{font-size:1rem;}
+  .pp-close{width:24px;height:24px;font-size:.7rem;}
   .pp-grid{
+    flex:1;overflow-y:auto;
     grid-template-columns:1fr 1fr;
-    grid-template-rows:auto;
+    grid-template-rows:auto auto auto;
   }
-  .pp-tall{
-    grid-row:auto;
-    grid-column:1 / 3;
-    flex-direction:row;
-    flex-wrap:wrap;
-  }
-  .pp-tall-row{flex:1;min-width:30%;border-bottom:none;border-right:1px solid #181818;}
+  /* ONDO short-term: full width row */
+  .pp-cell:nth-child(1){grid-column:1;}.pp-cell:nth-child(2){grid-column:2;}
+  .pp-cell:nth-child(3){grid-column:1 / 3;}
+  /* long-term: full width, 3 cols inside */
+  .pp-tall{grid-column:1 / 3;grid-row:auto;display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #181818;}
+  .pp-tall-row{border-bottom:none;border-right:1px solid #181818;padding:12px 10px;}
   .pp-tall-row:last-child{border-right:none;}
-  .pp-cell.pp-row2{border-bottom:1px solid #181818;}
-  .pp-big{font-size:1.4rem;}
-  .pp-cell{padding:16px 14px;}
+  .pp-tall-label{font-size:.56rem;margin-bottom:5px;}
+  .pp-tall-val{font-size:.9rem;}
+  /* alt coins: 2 per row */
+  .pp-row2{border-bottom:1px solid #181818;}
+  .pp-cell{padding:12px 12px;}
+  .pp-label{font-size:.56rem;margin-bottom:7px;}
+  .pp-big{font-size:1.3rem;}
+  .pp-sub{font-size:.65rem;}
+  .pp-alt-name{margin-bottom:8px;}
+  .pp-alt-sym{font-size:.78rem;}
+  .pp-alt-price{font-size:.65rem;}
+  .pp-alt-row{margin-bottom:5px;}
+  .pp-alt-period{font-size:.6rem;}
+  .pp-alt-val{font-size:.75rem;}
 }
+/* confirm popup */
+#confirmOverlay{position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
+#confirmOverlay.open{display:flex;}
+.confirm-box{background:#0e0e0e;border:1px solid #262626;border-radius:12px;padding:28px;width:320px;max-width:92vw;}
+.confirm-title{font-size:.95rem;font-weight:600;margin-bottom:8px;}
+.confirm-sub{font-size:.84rem;color:var(--muted);margin-bottom:22px;line-height:1.65;}
+.confirm-btns{display:flex;gap:8px;}
+.confirm-yes{flex:1;background:var(--text);color:var(--bg);border:none;padding:10px;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.confirm-yes:hover{opacity:.85;}
+.confirm-no{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:10px 16px;border-radius:8px;font-size:.84rem;cursor:pointer;transition:all .2s;}
+.confirm-no:hover{border-color:#333;color:var(--text);}
 /* rate limit popup */
 #rlOverlay{position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
 #rlOverlay.open{display:flex;}
@@ -1248,16 +1281,17 @@ function checkRlPass() {
   const val = document.getElementById('rlInput').value.trim();
   if (val === RL_PASS) {
     closeRl();
-    rlMark(); // reset today's usage so analysis runs
-    localStorage.removeItem(rlKey()); // allow once more
     doAnalysis();
   } else {
     document.getElementById('rlErr').style.display = 'block';
     document.getElementById('rlInput').value = '';
   }
 }
-
-async function runAnalysis() {
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+function confirmAnalysis() {
+  closeConfirm();
   if (rlUsed()) {
     document.getElementById('rlOverlay').classList.add('open');
     setTimeout(() => document.getElementById('rlInput').focus(), 100);
@@ -1265,6 +1299,10 @@ async function runAnalysis() {
   }
   rlMark();
   doAnalysis();
+}
+
+async function runAnalysis() {
+  document.getElementById('confirmOverlay').classList.add('open');
 }
 
 async function doAnalysis() {
@@ -1564,6 +1602,17 @@ function renderPopup(d) {
 
 
 </script>
+<!-- confirm popup -->
+<div id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title">Analiz başlatılsın mı?</div>
+    <div class="confirm-sub">Günde 1 analiz hakkınız bulunmaktadır. Claude web'i tarayarak ONDO fiyat hareketini analiz edecek. Şu anda kullanmak istiyor musunuz?</div>
+    <div class="confirm-btns">
+      <button class="confirm-yes" onclick="confirmAnalysis()">Evet, Analiz Et</button>
+      <button class="confirm-no" onclick="closeConfirm()">Hayır</button>
+    </div>
+  </div>
+</div>
 <!-- rate limit popup -->
 <div id="rlOverlay">
   <div class="rl-box">
