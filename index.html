@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OndoKeşif — Finansın Yeni Omurgası</title>
+<title>DeFi — OndoKeşif</title>
 <style>
 :root{--bg:#090909;--panel:#111;--panel2:#161616;--text:#fff;--muted:#666;--muted2:#333;--border:#1e1e1e;--border2:#2c2c2c;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -348,6 +348,51 @@ body.expert #expertGlow{opacity:1;}
 
 /* wave canvas removed */
 
+/* ─── MENU TRIGGER ─── */
+.menu-trigger{display:flex;align-items:center;gap:0;cursor:pointer;padding:6px 0 6px 16px;border-radius:6px;flex-shrink:0;transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.menu-bar{width:1.5px;height:19px;background:rgba(255,255,255,.4);border-radius:1px;transition:background .2s;flex-shrink:0;}
+.menu-open-label{font-size:.72rem;font-weight:400;color:var(--muted);opacity:0;transform:translateX(-5px);margin-left:8px;transition:opacity .25s ease,transform .25s ease,color .2s;white-space:nowrap;pointer-events:none;}
+.menu-open-label.showing{opacity:1;transform:translateX(0);}
+@media(hover:hover){
+  .menu-trigger:hover{transform:translateX(-6px);}
+  .menu-trigger:hover .menu-open-label{opacity:1;transform:translateX(0);}
+  .menu-trigger:hover .menu-bar{background:#fff;}
+}
+/* mode toggle only in mobile menu */
+.sm-mode{display:none;}
+@media(max-width:760px){.sm-mode{display:block;}}
+/* ─── SIDE MENU ─── */
+#sideOverlay{position:fixed;inset:0;z-index:1499;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s ease;}
+#sideOverlay.open{opacity:1;pointer-events:all;}
+#sideMenu{
+  position:fixed;top:0;right:0;bottom:0;width:270px;
+  background:rgba(9,9,9,.98);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-left:1px solid var(--border2);z-index:1500;
+  transform:translateX(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+}
+#sideMenu.open{transform:translateX(0);}
+.sm-top{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);}
+.sm-close{width:26px;height:26px;background:transparent;border:1px solid var(--border2);border-radius:50%;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.sm-close:hover{border-color:#333;color:#fff;}
+.sm-close svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.sm-mode{padding:16px 20px;border-bottom:1px solid var(--border);}
+.sm-mode .mode-sel{width:100%;}
+.sm-mode .mbtn{flex:1;text-align:center;}
+.sm-nav{flex:1;overflow-y:auto;padding:8px 0;}
+.sm-nav a{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;font-size:.88rem;color:var(--muted);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.04);transition:color .18s,background .18s;}
+.sm-nav a:last-child{border-bottom:none;}
+.sm-nav a:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.sm-nav a span{font-size:.6rem;color:var(--muted2);}
+/* ─── NS CARD LOGOS ─── */
+.ns-card{position:relative;overflow:hidden;}
+.ns-logo-bg{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:96px;height:96px;opacity:0.055;pointer-events:none;color:#fff;}
+.ns-logo-bg svg{width:100%;height:100%;}
+/* ─── POPUP NEWS BTN ─── */
+.pp-news-btn{display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border2);color:var(--muted);padding:7px 13px;border-radius:7px;font-size:.74rem;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.pp-news-btn:hover{border-color:#333;color:var(--text);}
+.pp-news-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
 @media(max-width:760px){
   h1{font-size:2.2rem;letter-spacing:-1px;}h2{font-size:1.65rem;}
   .wrap{padding:0 22px;}header{padding:13px 22px;}
@@ -355,7 +400,10 @@ body.expert #expertGlow{opacity:1;}
   .metrics{gap:28px;}.tl-item{grid-template-columns:1fr;gap:6px;}
   .reg-item{grid-template-columns:1fr;gap:6px;}
   .news-sources{grid-template-columns:1fr 1fr;}
-  .h-right{gap:10px;}.price-pill{display:none;}
+  .h-right{gap:10px;}
+  .mode-sel{display:none;}
+  .price-pill{display:flex;}
+  .pp-news-btn{display:none;}
 }
 </style>
 </head>
@@ -374,9 +422,9 @@ body.expert #expertGlow{opacity:1;}
 </div>
 
 <header>
-  <div>
+  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" style="text-decoration:none;">
     <span class="logo-o">Ondo</span><span class="logo-k">Keşif</span>
-  </div>
+  </a>
   <div class="h-right">
     <div class="price-pill" onclick="openPricePopup()" title="Detaylı performans görüntüle">
       <span style="font-size:.7rem;color:var(--muted)">ONDO</span>
@@ -386,6 +434,10 @@ body.expert #expertGlow{opacity:1;}
     <div class="mode-sel">
       <button class="mbtn active" onclick="setMode('b',this)">Yeni Başlayan</button>
       <button class="mbtn" onclick="setMode('e',this)">Uzman / Yatırımcı</button>
+    </div>
+    <div class="menu-trigger" id="menuTrigger" onclick="handleMenuTrigger()">
+      <div class="menu-bar"></div>
+      <span class="menu-open-label" id="menuLabel">Aç</span>
     </div>
   </div>
 </header>
@@ -669,51 +721,31 @@ body.expert #expertGlow{opacity:1;}
 <section id="news">
   <div class="tag">Güncel &amp; Analiz</div>
   <h2>AI Destekli<br>Haber Takibi</h2>
-  <p class="lead">Anthropic API anahtarınızla, ONDO'yu neden hareket ettirdiğini Claude'un web'i tarayarak Türkçe analiz etmesini sağlayın.</p>
+  <p class="lead">ONDO'yu neden hareket ettirdiğini Claude'un web'i tarayarak Türkçe analiz edin.</p>
 
-  <!-- Key yönetimi -->
-  <div id="keyPanel" class="key-card">
-    <div id="keySetup">
-      <h3>API Anahtarı ile Aktifleştir</h3>
-      <p style="color:var(--muted);font-size:.9rem;margin-top:8px;">Otomatik haber analizi için bir Anthropic API anahtarı gerekiyor. Anahtar yalnızca tarayıcınızda saklanır, hiçbir sunucuya gönderilmez.</p>
-      <div class="key-row">
-        <input class="key-input" type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-        <button class="key-btn" onclick="saveKey()">Kaydet</button>
-      </div>
-      <p class="key-note">Anahtar tarayıcınızın <code>localStorage</code>'ında tutulur. &nbsp;<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anahtar almak için →</a></p>
-    </div>
-    <div id="keySaved" style="display:none" class="key-saved">
-      <div class="key-status"><div class="key-dot"></div>API anahtarı aktif</div>
-      <button class="key-clear" onclick="clearKey()">Anahtarı Kaldır</button>
-    </div>
-  </div>
-
-  <!-- Analiz tetikleyici -->
-  <div class="analyze-bar" id="analyzeBar" style="display:none">
+  <div class="analyze-bar" id="analyzeBar">
     <div class="price-ctx">
       <span style="color:var(--muted2)">ONDO</span>
       <span class="ctx-change" id="ctxChange">—</span>
       <span id="ctxLabel" style="color:var(--muted2)">son 24 saat</span>
     </div>
     <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
-      <svg viewBox="0 0 14 14"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg>
       Neden? — Analiz Et
     </button>
   </div>
 
-  <!-- Sonuç alanı -->
   <div id="newsResult"></div>
 
-  <!-- API anahtarı yokken fallback -->
-  <div id="newsFallback">
-    <p style="font-size:.8rem;color:var(--muted2);margin-bottom:16px;">API anahtarı olmadan takip edebileceğiniz kaynaklar:</p>
+  <div id="newsFallback" style="margin-top:24px;">
+    <p style="font-size:.8rem;color:var(--muted2);margin-bottom:16px;">Haberleri takip edebileceğiniz kaynaklar:</p>
     <div class="fallback-grid">
-      <a class="ns-card" href="https://ondo.finance/blog" target="_blank" rel="noopener"><div class="ns-name">Ondo Blog</div><div class="ns-desc">Resmi duyurular ve ürün güncellemeleri</div></a>
-      <a class="ns-card" href="https://x.com/OndoFinance" target="_blank" rel="noopener"><div class="ns-name">X / Twitter</div><div class="ns-desc">Anlık gelişmeler</div></a>
-      <a class="ns-card" href="https://www.coindesk.com/search/?s=ondo+finance" target="_blank" rel="noopener"><div class="ns-name">CoinDesk</div><div class="ns-desc">Kurumsal haberler</div></a>
-      <a class="ns-card" href="https://cointelegraph.com/search?query=ondo" target="_blank" rel="noopener"><div class="ns-name">CoinTelegraph</div><div class="ns-desc">Piyasa analizleri</div></a>
-      <a class="ns-card" href="https://www.theblock.co/search#q=ondo" target="_blank" rel="noopener"><div class="ns-name">The Block</div><div class="ns-desc">Araştırma odaklı içerik</div></a>
-      <a class="ns-card" href="https://app.rwa.xyz/assets/ondo-finance" target="_blank" rel="noopener"><div class="ns-name">RWA.xyz</div><div class="ns-desc">TVL ve piyasa verileri</div></a>
+      <a class="ns-card" href="https://ondo.finance/blog" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M10 50 Q25 18 40 50 Q55 82 70 50 Q85 18 95 50"/></svg></div><div class="ns-name">Ondo Blog</div><div class="ns-desc">Resmi duyurular ve ürün güncellemeleri</div></a>
+      <a class="ns-card" href="https://x.com/OndoFinance" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"><line x1="14" y1="14" x2="86" y2="86"/><line x1="86" y1="14" x2="14" y2="86"/></svg></div><div class="ns-name">X / Twitter</div><div class="ns-desc">Anlık gelişmeler</div></a>
+      <a class="ns-card" href="https://www.coindesk.com/search/?s=ondo+finance" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7"><circle cx="50" cy="50" r="38"/><circle cx="50" cy="50" r="20"/></svg></div><div class="ns-name">CoinDesk</div><div class="ns-desc">Kurumsal haberler</div></a>
+      <a class="ns-card" href="https://cointelegraph.com/search?query=ondo" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="currentColor"><polygon points="10,90 90,10 90,55 50,55"/><polygon points="50,55 90,55 70,90"/></svg></div><div class="ns-name">CoinTelegraph</div><div class="ns-desc">Piyasa analizleri</div></a>
+      <a class="ns-card" href="https://www.theblock.co/search#q=ondo" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="currentColor"><rect x="8" y="8" width="38" height="38" rx="5"/><rect x="54" y="8" width="38" height="38" rx="5"/><rect x="8" y="54" width="38" height="38" rx="5"/><rect x="54" y="54" width="38" height="38" rx="5"/></svg></div><div class="ns-name">The Block</div><div class="ns-desc">Araştırma odaklı içerik</div></a>
+      <a class="ns-card" href="https://app.rwa.xyz/assets/ondo-finance" target="_blank" rel="noopener"><div class="ns-logo-bg"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"><rect x="8" y="35" width="36" height="30" rx="15"/><rect x="56" y="35" width="36" height="30" rx="15"/><line x1="44" y1="50" x2="56" y2="50"/></svg></div><div class="ns-name">RWA.xyz</div><div class="ns-desc">TVL ve piyasa verileri</div></a>
     </div>
   </div>
 </section>
@@ -781,7 +813,7 @@ body.expert #expertGlow{opacity:1;}
 </div>
 
 <footer>
-  <p>© 2026 OndoKeşif — Eğitim ve bilgi amaçlı içerik. Yatırım tavsiyesi değildir.</p>
+  <p><a href="mailto:ediz@edizkacmaz.com" style="color:var(--muted);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">Ediz</a> © 2026 OndoKeşif — Eğitim ve bilgi amaçlı içerik. Yatırım tavsiyesi değildir.</p>
 </footer>
 
 <div class="st" id="st" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
@@ -1075,43 +1107,101 @@ async function fetchPrice() {
 fetchPrice();
 setInterval(fetchPrice, 60000);
 
-/* ─── NEWS AI ─── */
-function newsInit() {
-  const key = localStorage.getItem('ondo_api_key');
-  if (key) {
-    document.getElementById('keySetup').style.display = 'none';
-    document.getElementById('keySaved').style.display = 'flex';
-    document.getElementById('analyzeBar').style.display = 'flex';
-    document.getElementById('newsFallback').style.display = 'none';
-  }
-}
-
-function saveKey() {
-  const val = document.getElementById('apiKeyInput').value.trim();
-  if (!val.startsWith('sk-ant')) {
-    const inp = document.getElementById('apiKeyInput');
-    inp.style.borderColor = '#f87171';
-    setTimeout(() => inp.style.borderColor = '', 1600);
-    return;
-  }
-  localStorage.setItem('ondo_api_key', val);
-  document.getElementById('keySetup').style.display = 'none';
-  document.getElementById('keySaved').style.display = 'flex';
-  document.getElementById('analyzeBar').style.display = 'flex';
-  document.getElementById('newsFallback').style.display = 'none';
-}
-
-function clearKey() {
-  localStorage.removeItem('ondo_api_key');
-  document.getElementById('keySetup').style.display = 'block';
-  document.getElementById('keySaved').style.display = 'none';
-  document.getElementById('analyzeBar').style.display = 'none';
-  document.getElementById('newsFallback').style.display = 'block';
-  document.getElementById('newsResult').innerHTML = '';
-  document.getElementById('apiKeyInput').value = '';
-}
+/* ─── NEWS AI (Cloudflare Worker) ─── */
+// Worker deploy ettikten sonra URL'yi güncelle:
+const WORKER_URL = 'https://ondo-kesif-ai.ediz-kacmaz19.workers.dev/';
 
 function updatePriceContext() {
+async function runAnalysis() {
+  const btn = document.getElementById('analyzeBtn');
+  const result = document.getElementById('newsResult');
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2a5 5 0 1 0 5 5"/></svg> Araştırılıyor...`;
+
+  const loadMsgs = ['Piyasa verisi işleniyor...','Claude güncel haberler için web\'i tarıyor...','Fiyat hareketi analiz ediliyor...','Sonuçlar derleniyor...'];
+  let msgIdx = 0;
+  result.innerHTML = `<div class="news-loading-state"><div class="news-spinner"></div><div class="news-loading-text" id="loadTxt">${loadMsgs[0]}</div></div>`;
+  const loadTimer = setInterval(() => {
+    msgIdx = Math.min(msgIdx + 1, loadMsgs.length - 1);
+    const el = document.getElementById('loadTxt');
+    if (el) el.textContent = loadMsgs[msgIdx];
+  }, 2800);
+
+  const mktCtxStr = buildMarketContext();
+  const today = new Date().toLocaleDateString('tr-TR', {day:'numeric',month:'long',year:'numeric'});
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2500,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: `Bugün ${today}. Piyasa verisi: ${mktCtxStr}
+
+Görevin: Ondo Finance (ONDO token) için iki ayrı web araması yap:
+1. Son 7 günde Ondo Finance hakkında çıkan haberler ("Ondo Finance news")
+2. Bu fiyat hareketinin spesifik sebebi ("ONDO token price movement reason today")
+
+Sonuçları birleştirip analiz et. ÖNEMLİ: Net bir haber bulamazsan bunu dürüstçe söyle ve genel piyasa etkisi mi, teknik toparlanma mı, spekülatif hareket mi olduğunu değerlendir.
+
+Sadece aşağıdaki JSON formatında cevap ver:
+{"summary":"2-3 cümle Türkçe: fiyat hareketinin en muhtemel açıklaması","catalyst":"news_driven veya market_driven veya technical_recovery veya unknown","news":[{"title":"Türkçe başlık","source":"kaynak","date":"tarih","url":"url","impact":"positive veya negative veya neutral","snippet":"tek cümle Türkçe"}]}
+En fazla 6 haber. Sadece JSON.`
+        }]
+      })
+    });
+
+    clearInterval(loadTimer);
+    if (!res.ok) {
+      let errBody = '';
+      try { const e = await res.json(); errBody = e?.error?.message || ''; } catch(_) {}
+      throw new Error(`http_${res.status}:${errBody}`);
+    }
+
+    const data = await res.json();
+    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('parse');
+    renderNews(JSON.parse(jsonMatch[0]));
+
+  } catch(err) {
+    clearInterval(loadTimer);
+    const detail = err.message.startsWith('http_') ? err.message.replace('http_','HTTP ') : err.message;
+    result.innerHTML = `<div class="key-card"><p style="color:var(--muted);font-size:.9rem;">Analiz alınamadı — <span style="color:#f87171;font-size:.82rem;">${detail}</span></p></div>`;
+  }
+
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg> Yenile`;
+}
+
+function renderNews(data) {
+  const ic = i => i === 'positive' ? 'pos' : i === 'negative' ? 'neg' : 'neu';
+  const il = i => i === 'positive' ? 'Olumlu' : i === 'negative' ? 'Olumsuz' : 'Nötr';
+  const catalystMap = {
+    news_driven:        { label:'Haber Kaynaklı',      color:'#4ade80' },
+    market_driven:      { label:'Genel Piyasa Etkisi', color:'#60a5fa' },
+    technical_recovery: { label:'Teknik Toparlanma',   color:'#facc15' },
+    unknown:            { label:'Net Katalizör Yok',   color:'#888'    }
+  };
+  const cat = catalystMap[data.catalyst] || catalystMap.unknown;
+  const catalystBadge = `<span style="display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.06);color:${cat.color};border:1px solid ${cat.color}30;margin-bottom:14px;">${cat.label}</span>`;
+  let mktStrip = '';
+  if (marketCtx.ondoChange != null) {
+    const btcLine = marketCtx.btcChange != null ? `<span style="color:var(--muted2)">·</span> BTC <span style="${parseFloat(marketCtx.btcChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.btcChange)>=0?'+':''}${marketCtx.btcChange}%</span>` : '';
+    const volLine = marketCtx.ondoVol24h ? `<span style="color:var(--muted2)">·</span> Hacim <span style="color:var(--muted)">$${(marketCtx.ondoVol24h/1e6).toFixed(1)}M</span>` : '';
+    mktStrip = `<div style="display:flex;align-items:center;gap:10px;font-size:.78rem;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;"><span style="color:var(--muted2);text-transform:uppercase;letter-spacing:1px;font-size:.68rem;">Piyasa</span><span>ONDO <span style="${parseFloat(marketCtx.ondoChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.ondoChange)>=0?'+':''}${marketCtx.ondoChange}%</span></span>${btcLine} ${volLine}</div>`;
+  }
+  const cards = (data.news || []).map(n => `<a class="nc" href="${n.url||'#'}" target="_blank" rel="noopener noreferrer"><div class="nc-top"><span class="nc-src">${n.source||''}</span><span class="nc-impact ${ic(n.impact)}">${il(n.impact)}</span></div><div class="nc-title">${n.title||''}</div><div class="nc-snippet">${n.snippet||''}</div><div class="nc-date">${n.date||''}</div></a>`).join('');
+  const noNewsNote = (!data.news || data.news.length === 0) ? `<p style="color:var(--muted);font-size:.88rem;padding:20px 0;">Son 7 günde öne çıkan haber bulunamadı.</p>` : '';
+  document.getElementById('newsResult').innerHTML = `<div class="ai-summary"><div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>${catalystBadge}<p>${data.summary||''}</p>${mktStrip}</div>${noNewsNote}<div class="news-grid">${cards}</div>`;
+}
   const el = document.getElementById('ctxChange');
   const lbl = document.getElementById('ctxLabel');
   if (!el || currentChange === null) return;
@@ -1139,152 +1229,30 @@ function buildMarketContext() {
   return lines.join(' ');
 }
 
-async function runAnalysis() {
-  const key = localStorage.getItem('ondo_api_key');
-  if (!key) return;
-
-  const btn = document.getElementById('analyzeBtn');
-  const result = document.getElementById('newsResult');
-
-  btn.disabled = true;
-  btn.classList.add('loading');
-  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2a5 5 0 1 0 5 5"/></svg> Araştırılıyor...`;
-
-  // Progressive loading messages
-  const loadMsgs = [
-    'Piyasa verisi işleniyor...',
-    'Claude güncel haberler için web\'i tarıyor...',
-    'Fiyat hareketi analiz ediliyor...',
-    'Sonuçlar derleniyor...'
-  ];
-  let msgIdx = 0;
-  result.innerHTML = `<div class="news-loading-state"><div class="news-spinner"></div><div class="news-loading-text" id="loadTxt">${loadMsgs[0]}</div></div>`;
-  const loadTimer = setInterval(() => {
-    msgIdx = Math.min(msgIdx + 1, loadMsgs.length - 1);
-    const el = document.getElementById('loadTxt');
-    if (el) el.textContent = loadMsgs[msgIdx];
-  }, 2800);
-
-  const mktCtxStr = buildMarketContext();
-  const today = new Date().toLocaleDateString('tr-TR', {day:'numeric', month:'long', year:'numeric'});
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2500,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{
-          role: 'user',
-          content: `Bugün ${today}. Piyasa verisi: ${mktCtxStr}
-
-Görevin: Ondo Finance (ONDO token) için iki ayrı web araması yap:
-1. Son 7 günde Ondo Finance hakkında çıkan haberler ("Ondo Finance news")
-2. Bu fiyat hareketinin spesifik sebebi ("ONDO token price movement reason today" veya "ONDO pump reason")
-
-Sonuçları birleştirip analiz et. ÖNEMLİ: Eğer fiyat hareketini açıklayan net bir haber bulamazsan, bunu dürüstçe söyle ve şu alternatifleri değerlendir: genel kripto piyasası etkisi mi, teknik toparlanma mı (önceki düşüş sonrası), kurumsal alım baskısı mı, yoksa habersiz spekülatif hareket mi olduğunu belirt.
-
-Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
-{"summary":"2-3 cümle Türkçe: fiyat hareketinin en muhtemel açıklaması — haber varsa haberi, yoksa dürüstçe piyasa dinamiğini belirt","catalyst":"news_driven veya market_driven veya technical_recovery veya unknown","news":[{"title":"Türkçe başlık","source":"kaynak","date":"tarih","url":"url","impact":"positive veya negative veya neutral","snippet":"tek cümle Türkçe"}]}
-En fazla 6 haber. Sadece JSON.`
-        }]
-      })
-    });
-
-    clearInterval(loadTimer);
-    if (res.status === 401) throw new Error('auth');
-    if (res.status === 402) throw new Error('billing');
-    if (!res.ok) {
-      let errBody = '';
-      try { const e = await res.json(); errBody = e?.error?.message || JSON.stringify(e); } catch(_) {}
-      throw new Error(`http_${res.status}:${errBody}`);
-    }
-
-    const data = await res.json();
-    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('parse');
-    renderNews(JSON.parse(jsonMatch[0]));
-
-  } catch(err) {
-    clearInterval(loadTimer);
-    if (err.message === 'auth') {
-      result.innerHTML = `<div class="key-card"><p style="color:#f87171;font-size:.9rem;">API anahtarı geçersiz veya süresi dolmuş. Lütfen anahtarı kaldırıp tekrar girin.</p></div>`;
-      clearKey();
-    } else if (err.message === 'billing') {
-      result.innerHTML = `<div class="key-card"><p style="color:#facc15;font-size:.9rem;">Hesabınızda API kredisi bulunmuyor. <a href="https://console.anthropic.com/settings/billing" target="_blank" style="color:#facc15;text-decoration:underline;">console.anthropic.com → Billing</a> sayfasından kredi yükleyin ($5 minimum, aylarca yeter).</p></div>`;
-    } else {
-      const detail = err.message.startsWith('http_') ? err.message.replace('http_','HTTP ') : err.message;
-      result.innerHTML = `<div class="key-card"><p style="color:var(--muted);font-size:.9rem;">Analiz alınamadı — <span style="color:#f87171;font-size:.82rem;">${detail}</span></p></div>`;
-    }
-  }
-
-  btn.disabled = false;
-  btn.classList.remove('loading');
-  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 7A4 4 0 1 1 7 3"/><path d="M11 3v4h-4"/></svg> Yenile`;
+/* ─── SIDE MENU ─── */
+function handleMenuTrigger() {
+  const label = document.getElementById('menuLabel');
+  label.classList.add('showing');
+  openMenu();
+  setTimeout(() => label.classList.remove('showing'), 400);
 }
-
-function renderNews(data) {
-  const ic = i => i === 'positive' ? 'pos' : i === 'negative' ? 'neg' : 'neu';
-  const il = i => i === 'positive' ? 'Olumlu' : i === 'negative' ? 'Olumsuz' : 'Nötr';
-
-  // Catalyst badge
-  const catalystMap = {
-    news_driven:       { label: 'Haber Kaynaklı',       color: '#4ade80' },
-    market_driven:     { label: 'Genel Piyasa Etkisi',  color: '#60a5fa' },
-    technical_recovery:{ label: 'Teknik Toparlanma',    color: '#facc15' },
-    unknown:           { label: 'Net Katalizör Yok',    color: '#888'    }
-  };
-  const cat = catalystMap[data.catalyst] || catalystMap.unknown;
-  const catalystBadge = `<span style="display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.06);color:${cat.color};border:1px solid ${cat.color}30;margin-bottom:14px;">${cat.label}</span>`;
-
-  // Market context strip
-  let mktStrip = '';
-  if (marketCtx.ondoChange != null) {
-    const btcLine = marketCtx.btcChange != null
-      ? `<span style="color:var(--muted2)">·</span> BTC <span style="${parseFloat(marketCtx.btcChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.btcChange)>=0?'+':''}${marketCtx.btcChange}%</span>`
-      : '';
-    const volLine = marketCtx.ondoVol24h
-      ? `<span style="color:var(--muted2)">·</span> Hacim <span style="color:var(--muted)">$${(marketCtx.ondoVol24h/1e6).toFixed(1)}M</span>`
-      : '';
-    mktStrip = `<div style="display:flex;align-items:center;gap:10px;font-size:.78rem;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">
-      <span style="color:var(--muted2);text-transform:uppercase;letter-spacing:1px;font-size:.68rem;">Piyasa</span>
-      <span>ONDO <span style="${parseFloat(marketCtx.ondoChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.ondoChange)>=0?'+':''}${marketCtx.ondoChange}%</span></span>
-      ${btcLine} ${volLine}
-    </div>`;
-  }
-
-  const cards = (data.news || []).map(n => `
-    <a class="nc" href="${n.url||'#'}" target="_blank" rel="noopener noreferrer">
-      <div class="nc-top">
-        <span class="nc-src">${n.source||''}</span>
-        <span class="nc-impact ${ic(n.impact)}">${il(n.impact)}</span>
-      </div>
-      <div class="nc-title">${n.title||''}</div>
-      <div class="nc-snippet">${n.snippet||''}</div>
-      <div class="nc-date">${n.date||''}</div>
-    </a>`).join('');
-
-  const noNewsNote = (!data.news || data.news.length === 0)
-    ? `<p style="color:var(--muted);font-size:.88rem;padding:20px 0;">Son 7 günde öne çıkan haber bulunamadı.</p>` : '';
-
-  document.getElementById('newsResult').innerHTML = `
-    <div class="ai-summary">
-      <div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>
-      ${catalystBadge}
-      <p>${data.summary||''}</p>
-      ${mktStrip}
-    </div>
-    ${noNewsNote}
-    <div class="news-grid">${cards}</div>`;
+function openMenu() {
+  document.getElementById('sideMenu').classList.add('open');
+  document.getElementById('sideOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  document.getElementById('sideMenu').classList.remove('open');
+  document.getElementById('sideOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setModeMenu(m) {
+  document.getElementById(m==='b'?'smModeB':'smModeE').classList.add('active');
+  document.getElementById(m==='b'?'smModeE':'smModeB').classList.remove('active');
+  document.body.classList.toggle('expert', m==='e');
+  document.querySelectorAll('.h-right .mbtn').forEach(b => {
+    b.classList.toggle('active', (m==='b'&&b.textContent.includes('Başlayan'))||(m==='e'&&b.textContent.includes('Uzman')));
+  });
 }
 
 /* ─── PRICE POPUP ─── */
@@ -1440,7 +1408,35 @@ function renderPopup(d) {
 
 
 </script>
-<!-- ─── PRICE POPUP ─── -->
+<!-- ─── SIDE MENU ─── -->
+<div id="sideOverlay" onclick="closeMenu()"></div>
+<div id="sideMenu">
+  <div class="sm-top">
+    <span style="font-size:.72rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)">Menü</span>
+    <button class="sm-close" onclick="closeMenu()">
+      <svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
+    </button>
+  </div>
+  <div class="sm-mode">
+    <div class="mode-sel" style="width:100%">
+      <button class="mbtn active" id="smModeB" onclick="setModeMenu('b')">Yeni Başlayan</button>
+      <button class="mbtn" id="smModeE" onclick="setModeMenu('e')">Uzman / Yatırımcı</button>
+    </div>
+  </div>
+  <nav class="sm-nav">
+    <a href="#what"     onclick="closeMenu()">Ondo Nedir? <span>↓</span></a>
+    <a href="#why"      onclick="closeMenu()">Neden Önemli? <span>↓</span></a>
+    <a href="#products" onclick="closeMenu()">Ürünler <span>↓</span></a>
+    <a href="#partners" onclick="closeMenu()">Ekosistem <span>↓</span></a>
+    <a href="#market"   onclick="closeMenu()">Pazar Fırsatı <span>↓</span></a>
+    <a href="#revenue"  onclick="closeMenu()">Ondo Nasıl Para Kazanıyor? <span>↓</span></a>
+    <a href="#timeline" onclick="closeMenu()">Kilometre Taşları <span>↓</span></a>
+    <a href="#news"     onclick="closeMenu()">AI Haber Analizi <span>↓</span></a>
+    <a href="#risk"     onclick="closeMenu()">Risk Analizi <span>↓</span></a>
+  </nav>
+</div>
+
+
 <div id="pricePopup" onclick="handlePopupClick(event)">
   <div class="pp-wrap">
     <div class="pp-head">
@@ -1448,6 +1444,10 @@ function renderPopup(d) {
         <span class="pp-coin">ONDO / USD</span>
         <span class="pp-price" id="ppPrice">—</span>
       </div>
+      <button class="pp-news-btn" onclick="closePopup();setTimeout(()=>document.getElementById('news').scrollIntoView({behavior:'smooth'}),200)">
+        <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4"/><line x1="6" y1="3" x2="6" y2="6"/><circle cx="6" cy="8.5" r=".5" fill="currentColor"/></svg>
+        Neden hareket ediyor?
+      </button>
       <button class="pp-close" onclick="closePopup()">
         <svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/></svg>
       </button>
