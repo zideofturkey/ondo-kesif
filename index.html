@@ -1121,6 +1121,14 @@ setInterval(fetchPrice, 60000);
 const WORKER_URL = 'https://ondo-kesif-ai.ediz-kacmaz19.workers.dev/';
 
 function updatePriceContext() {
+  const el = document.getElementById('ctxChange');
+  const lbl = document.getElementById('ctxLabel');
+  if (!el || currentChange === null) return;
+  el.textContent = (currentChange >= 0 ? '+' : '') + currentChange.toFixed(2) + '%';
+  el.className = 'ctx-change ' + (currentChange >= 0 ? 'up' : 'down');
+  lbl.textContent = 'son 24 saat — neden?';
+}
+
 async function runAnalysis() {
   const btn = document.getElementById('analyzeBtn');
   const result = document.getElementById('newsResult');
@@ -1216,34 +1224,6 @@ function renderNews(data) {
   const noNewsNote = (!data.news || data.news.length === 0) ? `<p style="color:var(--muted);font-size:.88rem;padding:20px 0;">Son 7 günde öne çıkan haber bulunamadı.</p>` : '';
   document.getElementById('newsResult').innerHTML = `<div class="ai-summary"><div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>${catalystBadge}<p>${data.summary||''}</p>${mktStrip}</div>${noNewsNote}<div class="news-grid">${cards}</div>`;
 }
-  const el = document.getElementById('ctxChange');
-  const lbl = document.getElementById('ctxLabel');
-  if (!el || currentChange === null) return;
-  el.textContent = (currentChange >= 0 ? '+' : '') + currentChange.toFixed(2) + '%';
-  el.className = 'ctx-change ' + (currentChange >= 0 ? 'up' : 'down');
-  lbl.textContent = 'son 24 saat — neden?';
-}
-
-function buildMarketContext() {
-  const lines = [];
-  if (marketCtx.ondoChange != null)
-    lines.push(`ONDO son 24 saatte %${marketCtx.ondoChange > 0 ? '+' : ''}${marketCtx.ondoChange} hareket etti.`);
-  if (marketCtx.ondoVol24h)
-    lines.push(`ONDO 24 saatlik işlem hacmi: $${(marketCtx.ondoVol24h/1e6).toFixed(1)}M.`);
-  if (marketCtx.btcChange != null)
-    lines.push(`Aynı dönemde Bitcoin %${marketCtx.btcChange > 0 ? '+' : ''}${marketCtx.btcChange} değişti.`);
-  // Correlation hint
-  if (marketCtx.ondoChange != null && marketCtx.btcChange != null) {
-    const diff = Math.abs(parseFloat(marketCtx.ondoChange) - parseFloat(marketCtx.btcChange));
-    if (diff < 2)
-      lines.push('Not: ONDO ve BTC hareketi birbirine çok yakın — genel piyasa etkisi güçlü olabilir.');
-    else if (parseFloat(marketCtx.ondoChange) > parseFloat(marketCtx.btcChange) + 5)
-      lines.push('Not: ONDO, BTC\'yi belirgin şekilde aştı — projeye özgü bir katalizör olabilir.');
-  }
-  return lines.join(' ');
-}
-
-/* ─── SIDE MENU ─── */
 function handleMenuTrigger() {
   const label = document.getElementById('menuLabel');
   label.classList.add('showing');
