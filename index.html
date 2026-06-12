@@ -469,6 +469,20 @@ body.expert #expertGlow{opacity:1;}
   .price-pill{display:flex;}
   .pp-news-btn{display:none;}
 }
+/* rate limit popup */
+#rlOverlay{position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
+#rlOverlay.open{display:flex;}
+.rl-box{background:#0e0e0e;border:1px solid #262626;border-radius:12px;padding:32px 28px;width:340px;max-width:92vw;}
+.rl-title{font-size:1rem;font-weight:600;margin-bottom:8px;}
+.rl-sub{font-size:.85rem;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.rl-input{width:100%;background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;border-radius:7px;font-size:.88rem;font-family:inherit;outline:none;margin-bottom:12px;letter-spacing:2px;}
+.rl-input:focus{border-color:#3a3a3a;}
+.rl-btns{display:flex;gap:8px;}
+.rl-ok{flex:1;background:var(--text);color:var(--bg);border:none;padding:10px;border-radius:7px;font-size:.84rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.rl-ok:hover{opacity:.85;}
+.rl-cancel{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:10px 16px;border-radius:7px;font-size:.84rem;cursor:pointer;transition:all .2s;}
+.rl-cancel:hover{border-color:#333;color:var(--text);}
+.rl-err{font-size:.78rem;color:#f87171;margin-top:8px;display:none;}
 </style>
 </head>
 <body>
@@ -1058,6 +1072,7 @@ async function fetchLlamaData() {
   const rwaTotalB = rwaProtos.reduce((sum, p) => sum + p.tvl, 0) / 1e9;
   const share = ondoB / rwaTotalB * 100;
   _llamaCache = { ondoB, rwaTotalB, share, rwaProtos, allProtocols };
+  window._llamaTvl = ondoB;
   return _llamaCache;
 }
 
@@ -1147,9 +1162,9 @@ let marketCtx = {};   // BTC change, ONDO volume vs avg — fed to Claude
 
 async function fetchPrice() {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ondo-finance,bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true');
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ondo-finance,bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_7d_change=true');
     const d = await r.json();
-    const ondo = d['ondo-finance'], btc = d['bitcoin'];
+    const ondo = d['ondo-finance'], btc = d['bitcoin'], eth = d['ethereum'], sol = d['solana'];
     if (ondo?.usd) {
       document.getElementById('pv').textContent = '$' + ondo.usd.toFixed(3);
       const el = document.getElementById('pc');
@@ -1158,12 +1173,17 @@ async function fetchPrice() {
       el.className = 'price-chg ' + (currentChange >= 0 ? 'up' : 'down');
       updatePriceContext();
     }
-    // Store market context for Claude
     marketCtx = {
-      ondoChange: ondo?.usd_24h_change?.toFixed(2),
-      ondoVol24h: ondo?.usd_24h_vol,
-      btcChange:  btc?.usd_24h_change?.toFixed(2),
-      btcPrice:   btc?.usd
+      ondoChange:   ondo?.usd_24h_change?.toFixed(2),
+      ondoChange7d: ondo?.usd_7d_change?.toFixed(2),
+      ondoVol24h:   ondo?.usd_24h_vol,
+      btcChange:    btc?.usd_24h_change?.toFixed(2),
+      btcChange7d:  btc?.usd_7d_change?.toFixed(2),
+      btcPrice:     btc?.usd,
+      ethChange:    eth?.usd_24h_change?.toFixed(2),
+      ethChange7d:  eth?.usd_7d_change?.toFixed(2),
+      solChange:    sol?.usd_24h_change?.toFixed(2),
+      solChange7d:  sol?.usd_7d_change?.toFixed(2),
     };
     updateHeroVol();
   } catch(e) {}
@@ -1186,23 +1206,48 @@ function updatePriceContext() {
 
 function buildMarketContext() {
   const lines = [];
-  if (marketCtx.ondoChange != null)
-    lines.push(`ONDO son 24 saatte %${marketCtx.ondoChange > 0 ? '+' : ''}${marketCtx.ondoChange} hareket etti.`);
-  if (marketCtx.ondoVol24h)
-    lines.push(`ONDO 24 saatlik işlem hacmi: $${(marketCtx.ondoVol24h/1e6).toFixed(1)}M.`);
-  if (marketCtx.btcChange != null)
-    lines.push(`Aynı dönemde Bitcoin %${marketCtx.btcChange > 0 ? '+' : ''}${marketCtx.btcChange} değişti.`);
-  if (marketCtx.ondoChange != null && marketCtx.btcChange != null) {
-    const diff = Math.abs(parseFloat(marketCtx.ondoChange) - parseFloat(marketCtx.btcChange));
-    if (diff < 2)
-      lines.push('Not: ONDO ve BTC hareketi birbirine çok yakın — genel piyasa etkisi güçlü olabilir.');
-    else if (parseFloat(marketCtx.ondoChange) > parseFloat(marketCtx.btcChange) + 5)
-      lines.push('Not: ONDO, BTC\'yi belirgin şekilde aştı — projeye özgü bir katalizör olabilir.');
-  }
+  if (marketCtx.ondoChange != null) lines.push(`ONDO 24s: %${marketCtx.ondoChange > 0 ? '+' : ''}${marketCtx.ondoChange}, 7g: %${marketCtx.ondoChange7d > 0 ? '+' : ''}${marketCtx.ondoChange7d||'?'}.`);
+  if (marketCtx.btcChange  != null) lines.push(`BTC 24s: %${marketCtx.btcChange > 0 ? '+' : ''}${marketCtx.btcChange}, 7g: %${marketCtx.btcChange7d > 0 ? '+' : ''}${marketCtx.btcChange7d||'?'}.`);
+  if (marketCtx.ethChange  != null) lines.push(`ETH 24s: %${marketCtx.ethChange > 0 ? '+' : ''}${marketCtx.ethChange}, 7g: %${marketCtx.ethChange7d > 0 ? '+' : ''}${marketCtx.ethChange7d||'?'}.`);
+  if (marketCtx.solChange  != null) lines.push(`SOL 24s: %${marketCtx.solChange > 0 ? '+' : ''}${marketCtx.solChange}, 7g: %${marketCtx.solChange7d > 0 ? '+' : ''}${marketCtx.solChange7d||'?'}.`);
+  if (marketCtx.ondoVol24h) lines.push(`ONDO 24s hacim: $${(marketCtx.ondoVol24h/1e6).toFixed(1)}M.`);
   return lines.join(' ');
 }
 
+/* ─── RATE LIMIT ─── */
+const RL_PASS = '651129';
+function rlKey() { return 'ondo_rl_' + new Date().toISOString().split('T')[0]; }
+function rlUsed() { return localStorage.getItem(rlKey()) === '1'; }
+function rlMark() { localStorage.setItem(rlKey(), '1'); }
+function closeRl() {
+  document.getElementById('rlOverlay').classList.remove('open');
+  document.getElementById('rlInput').value = '';
+  document.getElementById('rlErr').style.display = 'none';
+}
+function checkRlPass() {
+  const val = document.getElementById('rlInput').value.trim();
+  if (val === RL_PASS) {
+    closeRl();
+    rlMark(); // reset today's usage so analysis runs
+    localStorage.removeItem(rlKey()); // allow once more
+    doAnalysis();
+  } else {
+    document.getElementById('rlErr').style.display = 'block';
+    document.getElementById('rlInput').value = '';
+  }
+}
+
 async function runAnalysis() {
+  if (rlUsed()) {
+    document.getElementById('rlOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('rlInput').focus(), 100);
+    return;
+  }
+  rlMark();
+  doAnalysis();
+}
+
+async function doAnalysis() {
   const btn = document.getElementById('analyzeBtn');
   const result = document.getElementById('newsResult');
 
@@ -1232,21 +1277,20 @@ async function runAnalysis() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 2500,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{
           role: 'user',
-          content: `Bugün ${today}. Piyasa verisi: ${mktCtxStr}
+          content: `Bugün ${today}. Güncel piyasa verileri (CoinGecko'dan canlı): ${mktCtxStr}
+NOT: Ondo Finance'in güncel TVL'si DeFiLlama'ya göre yaklaşık $${(window._llamaTvl||3.7).toFixed(1)} milyar dolardır. Haberlerde eski/farklı rakamlar görebilirsin — analizde bu güncel değeri kullan.
 
-Görevin: Ondo Finance (ONDO token) için iki ayrı web araması yap:
-1. Son 7 günde Ondo Finance hakkında çıkan haberler ("Ondo Finance news")
-2. Bu fiyat hareketinin spesifik sebebi ("ONDO token price movement reason today")
+Görevin: Ondo Finance (ONDO token) için iki web araması yap:
+1. Son 7 günde Ondo Finance haberleri ("Ondo Finance news this week")
+2. Fiyat hareketinin sebebi ("ONDO token price movement reason")
 
-Sonuçları birleştirip analiz et. ÖNEMLİ: Net bir haber bulamazsan bunu dürüstçe söyle ve genel piyasa etkisi mi, teknik toparlanma mı, spekülatif hareket mi olduğunu değerlendir.
-
-Sadece aşağıdaki JSON formatında cevap ver:
-{"summary":"2-3 cümle Türkçe: fiyat hareketinin en muhtemel açıklaması","catalyst":"news_driven veya market_driven veya technical_recovery veya unknown","news":[{"title":"Türkçe başlık","source":"kaynak","date":"tarih","url":"url","impact":"positive veya negative veya neutral","snippet":"tek cümle Türkçe"}]}
+Sadece aşağıdaki JSON formatında cevap ver, başka hiçbir şey yazma:
+{"summary":"2-3 cümle Türkçe özet","catalyst":"news_driven veya market_driven veya technical_recovery veya unknown","news":[{"title":"Türkçe başlık","source":"kaynak","date":"tarih","url":"url","impact":"positive veya negative veya neutral","snippet":"tek cümle Türkçe"}],"comparison":"ONDO'nun BTC/ETH/SOL ile karşılaştırmalı performans analizi: kim ne kadar kazandı/kaybetti, ONDO ayrışıyor mu yoksa piyasayla mı hareket ediyor, varsa korelasyon veya ayrışmanın olası sebebi. 3-4 cümle Türkçe."}
 En fazla 6 haber. Sadece JSON.`
         }]
       })
@@ -1289,13 +1333,28 @@ function renderNews(data) {
   const catalystBadge = `<span style="display:inline-block;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.06);color:${cat.color};border:1px solid ${cat.color}30;margin-bottom:14px;">${cat.label}</span>`;
   let mktStrip = '';
   if (marketCtx.ondoChange != null) {
-    const btcLine = marketCtx.btcChange != null ? `<span style="color:var(--muted2)">·</span> BTC <span style="${parseFloat(marketCtx.btcChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.btcChange)>=0?'+':''}${marketCtx.btcChange}%</span>` : '';
-    const volLine = marketCtx.ondoVol24h ? `<span style="color:var(--muted2)">·</span> Hacim <span style="color:var(--muted)">$${(marketCtx.ondoVol24h/1e6).toFixed(1)}M</span>` : '';
-    mktStrip = `<div style="display:flex;align-items:center;gap:10px;font-size:.78rem;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;"><span style="color:var(--muted2);text-transform:uppercase;letter-spacing:1px;font-size:.68rem;">Piyasa</span><span>ONDO <span style="${parseFloat(marketCtx.ondoChange)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(marketCtx.ondoChange)>=0?'+':''}${marketCtx.ondoChange}%</span></span>${btcLine} ${volLine}</div>`;
+    const c = v => v == null ? '' : `<span style="${parseFloat(v)>=0?'color:#4ade80':'color:#f87171'}">${parseFloat(v)>=0?'+':''}${v}%</span>`;
+    const dot = `<span style="color:var(--muted2)">·</span>`;
+    const volLine = marketCtx.ondoVol24h ? `${dot} Hacim <span style="color:var(--muted)">$${(marketCtx.ondoVol24h/1e6).toFixed(1)}M</span>` : '';
+    mktStrip = `<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">
+      <span style="color:var(--muted2);text-transform:uppercase;letter-spacing:1px;font-size:.68rem;">24s</span>
+      <span>ONDO ${c(marketCtx.ondoChange)}</span>
+      ${marketCtx.btcChange  != null ? `${dot} BTC ${c(marketCtx.btcChange)}`  : ''}
+      ${marketCtx.ethChange  != null ? `${dot} ETH ${c(marketCtx.ethChange)}`  : ''}
+      ${marketCtx.solChange  != null ? `${dot} SOL ${c(marketCtx.solChange)}`  : ''}
+      ${volLine}
+    </div>`;
   }
+  const compSection = data.comparison ? `
+    <div style="margin-top:12px;padding:18px 20px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;">
+      <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+        <span style="width:5px;height:5px;border-radius:50%;background:#60a5fa;display:inline-block;"></span>Piyasa Karşılaştırması
+      </div>
+      <p style="font-size:.88rem;color:rgba(255,255,255,.75);line-height:1.8;">${data.comparison}</p>
+    </div>` : '';
   const cards = (data.news || []).map(n => `<a class="nc" href="${n.url||'#'}" target="_blank" rel="noopener noreferrer"><div class="nc-top"><span class="nc-src">${n.source||''}</span><span class="nc-impact ${ic(n.impact)}">${il(n.impact)}</span></div><div class="nc-title">${n.title||''}</div><div class="nc-snippet">${n.snippet||''}</div><div class="nc-date">${n.date||''}</div></a>`).join('');
   const noNewsNote = (!data.news || data.news.length === 0) ? `<p style="color:var(--muted);font-size:.88rem;padding:20px 0;">Son 7 günde öne çıkan haber bulunamadı.</p>` : '';
-  document.getElementById('newsResult').innerHTML = `<div class="ai-summary"><div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>${catalystBadge}<p>${data.summary||''}</p>${mktStrip}</div>${noNewsNote}<div class="news-grid">${cards}</div>`;
+  document.getElementById('newsResult').innerHTML = `<div class="ai-summary"><div class="ai-label"><div class="ai-pulse"></div>Claude Analizi</div>${catalystBadge}<p>${data.summary||''}</p>${mktStrip}${compSection}</div>${noNewsNote}<div class="news-grid">${cards}</div>`;
 }
 function handleMenuTrigger() {
   const label = document.getElementById('menuLabel');
@@ -1475,7 +1534,20 @@ function renderPopup(d) {
 
 
 </script>
-<!-- ─── SIDE MENU ─── -->
+<!-- rate limit popup -->
+<div id="rlOverlay">
+  <div class="rl-box">
+    <div class="rl-title">Günlük limit doldu</div>
+    <div class="rl-sub">Bu analiz günde 1 kez ücretsiz çalışır. Tekrar analiz için erişim parolasını girin.</div>
+    <input class="rl-input" type="password" id="rlInput" placeholder="••••••" onkeydown="if(event.key==='Enter')checkRlPass()">
+    <div class="rl-err" id="rlErr">Hatalı parola.</div>
+    <div class="rl-btns">
+      <button class="rl-ok" onclick="checkRlPass()">Devam Et</button>
+      <button class="rl-cancel" onclick="closeRl()">İptal</button>
+    </div>
+  </div>
+</div>
+
 <div id="sideOverlay" onclick="closeMenu()"></div>
 <div id="sideMenu">
   <div class="sm-top">
