@@ -1,0 +1,97 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#0c1521"/>
+      <stop offset="45%"  stop-color="#09111d"/>
+      <stop offset="100%" stop-color="#0d1828"/>
+    </linearGradient>
+    <!-- edge glows -->
+    <radialGradient id="gL" cx="0" cy="0.5" r="0.45" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.09"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gR" cx="1" cy="0.5" r="0.45" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gT" cx="0.5" cy="0" r="0.55" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gTL" cx="0" cy="0" r="0.35" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gTR" cx="1" cy="0" r="0.35" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.11"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gBL" cx="0" cy="1" r="0.3" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gBR" cx="1" cy="1" r="0.3" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#ffe882" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ffe882" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <!-- glows -->
+  <rect width="1280" height="320" fill="url(#gL)"/>
+  <rect width="1280" height="320" fill="url(#gR)"/>
+  <rect width="1280" height="320" fill="url(#gT)"/>
+  <rect width="1280" height="320" fill="url(#gTL)"/>
+  <rect width="1280" height="320" fill="url(#gTR)"/>
+  <rect width="1280" height="320" fill="url(#gBL)"/>
+  <rect width="1280" height="320" fill="url(#gBR)"/>
+
+  <!-- outer border -->
+  <rect width="1280" height="320" fill="none" stroke="#1e2d4a" stroke-width="1"/>
+  <!-- top highlight line -->
+  <line x1="0" y1="0.5" x2="1280" y2="0.5" stroke="rgba(255,232,130,0.18)" stroke-width="1"/>
+
+  <!-- live dot -->
+  <circle cx="555" cy="118" r="4" fill="#4ade80"/>
+
+  <!-- OndoKeşif title — tspan trick for two-tone in one centered text -->
+  <text x="640" y="152"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif"
+    font-size="68"
+    letter-spacing="-1">
+    <tspan font-weight="700" fill="#ffffff">Ondo</tspan><tspan font-weight="300" fill="rgba(255,255,255,0.3)" letter-spacing="1">Keşif</tspan>
+  </text>
+
+  <!-- tagline -->
+  <text x="640" y="192"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif"
+    font-size="15.5" font-weight="400" fill="#4a5a70" letter-spacing="0.4">
+    AI-Powered Ondo Finance Intelligence Dashboard
+  </text>
+
+  <!-- divider -->
+  <line x1="440" y1="215" x2="840" y2="215" stroke="#1a2a3e" stroke-width="1"/>
+
+  <!-- stats row -->
+  <text x="640" y="244"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif"
+    font-size="13" fill="#3a5040" letter-spacing="0.3">
+    <tspan fill="#3d6b4f">$3.7B+ TVL</tspan>
+    <tspan fill="#2a3a50" dx="14">·</tspan>
+    <tspan fill="#3a4a6a" dx="14">53% RWA Market Share</tspan>
+    <tspan fill="#2a3a50" dx="14">·</tspan>
+    <tspan fill="#3a4a6a" dx="14">Claude AI  +  Cloudflare Workers</tspan>
+  </text>
+
+  <!-- bottom caption -->
+  <text x="640" y="286"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif"
+    font-size="12" fill="#1e2d42" letter-spacing="2">
+    VANILLA HTML · ZERO DEPENDENCIES · OPEN SOURCE
+  </text>
+</svg>
