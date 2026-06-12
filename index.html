@@ -465,9 +465,29 @@ body.expert #expertGlow{opacity:1;}
   .reg-item{grid-template-columns:1fr;gap:6px;}
   .news-sources{grid-template-columns:1fr 1fr;}
   .h-right{gap:10px;}
-  .mode-sel{display:none;}
+  .h-right .mode-sel{display:none;}
+  #sideMenu .mode-sel{display:flex;}
   .price-pill{display:flex;}
   .pp-news-btn{display:none;}
+  /* mobile price popup */
+  .pp-wrap{border-radius:10px;max-height:92vh;overflow-y:auto;}
+  .pp-head{padding:14px 16px;}
+  .pp-price{font-size:1.1rem;}
+  .pp-grid{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto;
+  }
+  .pp-tall{
+    grid-row:auto;
+    grid-column:1 / 3;
+    flex-direction:row;
+    flex-wrap:wrap;
+  }
+  .pp-tall-row{flex:1;min-width:30%;border-bottom:none;border-right:1px solid #181818;}
+  .pp-tall-row:last-child{border-right:none;}
+  .pp-cell.pp-row2{border-bottom:1px solid #181818;}
+  .pp-big{font-size:1.4rem;}
+  .pp-cell{padding:16px 14px;}
 }
 /* rate limit popup */
 #rlOverlay{position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
@@ -1358,9 +1378,19 @@ function renderNews(data) {
 }
 function handleMenuTrigger() {
   const label = document.getElementById('menuLabel');
+  const isMobile = !window.matchMedia('(hover:hover)').matches;
   label.classList.add('showing');
-  openMenu();
-  setTimeout(() => label.classList.remove('showing'), 400);
+  if (isMobile) {
+    // mobile: show "Aç" briefly, then open
+    setTimeout(() => {
+      label.classList.remove('showing');
+      openMenu();
+    }, 360);
+  } else {
+    // desktop: open immediately, "Aç" fades out
+    openMenu();
+    setTimeout(() => label.classList.remove('showing'), 400);
+  }
 }
 function openMenu() {
   document.getElementById('sideMenu').classList.add('open');
